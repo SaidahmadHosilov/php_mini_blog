@@ -70,6 +70,7 @@
   </script>
   <!-- CK Editor -->
 
+  <script src="/template/js/comment_ajax.js"></script>
   <script src="/template/js/main.js"></script>
 
 

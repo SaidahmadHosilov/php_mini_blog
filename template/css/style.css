@@ -1,5 +1,6 @@
 /* Base */
 body {
+  overflow-x: hidden;
   line-height: 1.7;
   color: gray;
   font-weight: 300;
@@ -947,6 +948,7 @@ h1, h2, h3, h4, h5,
       float: left; }
       .comment-list li .vcard img {
         width: 50px;
+        height: 50px;
         border-radius: 50%; }
     .comment-list li .comment-body {
       float: right;

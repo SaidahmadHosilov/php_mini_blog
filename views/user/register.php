@@ -14,6 +14,10 @@
         <input type="email" value="<?=$email?>" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
         <div id="emailHelp" class="form-text"><?=$errors['email'] ?? ''?></div>
     </div>
+    <div class="mb-3">
+        <label for="bio" class="form-label">Information about you</label>
+        <textarea name="bio" id="bio" cols="30" rows="10" class="form-control" placeholder="Men kim, Hosilov Saidahmad ..."><?=$bio?></textarea>
+    </div>
     <div class="mb-3 row">
         <div class=" col-md-6">
             <label for="exampleInputPassword1" class="form-label">Password</label>

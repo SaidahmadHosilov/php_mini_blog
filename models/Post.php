@@ -2,6 +2,16 @@
 
 class Post
 {
+    public static function getPostIdBeforeDeletingComment($comment_id)
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT post_id FROM comments WHERE id = $comment_id";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetch();
+    }
+
     public static function insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgName, $userId)
     {
         $db = Db::getConnection();
@@ -10,18 +20,10 @@ class Post
         $sql = "INSERT INTO posts (title, text, main_text, image, is_recent, created_at, tag_name, ctg_name, user_id)
         VALUES ('$title', '$text', '$mainContent', '$image', 0, '$date', '$tagName', '$ctgName', $userId)"; 
         $db->query($sql);
-        // $result = $db->prepare($sql);
-        // $result->bindParam(':title', $title, PDO::PARAM_STR);
-        // $result->bindParam(':text', $text, PDO::PARAM_STR);
-        // $result->bindParam(':main-text', $mainContent, PDO::PARAM_STR);
-        // $result->bindParam(':image', $image, PDO::PARAM_STR);
-        // $result->bindParam(':created_at', $date, PDO::PARAM_STR); 
-        // $result->bindParam(':tag_name', $tagName, PDO::PARAM_STR);
-        // $result->bindParam(':ctg_name', $ctgName, PDO::PARAM_STR);
-        // $result->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        // $result->execute();
+
         return true;
     }
+
     public static function checkTitle($title)
     {
         if( strlen($title) < 4 ) {
@@ -83,5 +85,115 @@ class Post
         }
 
         return $arr;
+    }
+
+    public static function getCurrentPost($id)
+    {
+        $db = Db::getConnection();
+
+        $sql = "SELECT * FROM posts WHERE id = $id";
+
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        $arr = $result->fetch();
+        
+        $userId = intval($arr['user_id']);
+
+        $state = $db->query("SELECT * FROM users WHERE id = $userId");
+        $state->setFetchMode(PDO::FETCH_ASSOC);
+        array_push($arr, $state->fetch());
+
+        return $arr;
+    }
+
+    public static function getPopularPosts($limit)
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT * FROM posts WHERE is_popular = 1 LIMIT $limit";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        
+        return $result->fetchAll();
+    }
+
+    public static function getCategoriesList()
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT * FROM categories";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        
+        return $result->fetchAll();
+    }
+
+    public static function getTagsList()
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT * FROM tags";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetchAll();
+    }
+
+    public static function insertDataComment($userId, $time, $comment, $postId)
+    {
+        $db = Db::getConnection();
+        $sql = "INSERT INTO comments ( text, time, user_id, post_id ) 
+                VALUES ( '$comment', '$time', $userId, $postId )";
+        $db->query($sql);
+        
+        $result = $db->query("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
+        users.name, users.image from comments inner join users 
+        on users.id = comments.user_id where comments.post_id = $postId");
+
+        $i = 0;
+
+        $allComments = array();
+
+        while($row = $result->fetch()){
+            $allComments[$i]['id'] = $row['id'];
+            $allComments[$i]['text'] = $row['text'];
+            $allComments[$i]['time'] = $row['time'];
+            $allComments[$i]['post_id'] = $row['post_id'];
+            $allComments[$i]['user_id'] = $row['user_id'];
+            $allComments[$i]['name'] = $row['name'];
+            $allComments[$i]['image'] = $row['image'];
+            $i++;
+        }
+
+        return $allComments;
+    }
+
+    public static function getCurrentComments($postId)
+    {
+        $db = Db::getConnection();
+        $sql = ("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
+        users.name, users.image from comments inner join users 
+        on users.id = comments.user_id where comments.post_id = $postId");
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetchAll();
+    }
+
+    public static function countComments($id)
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT COUNT(*) as total FROM comments WHERE post_id = $id";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetch();   
+    }
+
+    public static function deleteComment($id)
+    {
+        $db = Db::getConnection();
+        $sql = "DELETE FROM comments WHERE id = $id";
+        $db->query($sql);
+
+        return true;
     }
 }

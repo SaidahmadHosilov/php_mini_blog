@@ -70,7 +70,7 @@ if(isset($_SESSION['user'])){
                     <!-- <li><a href="/admin/"> Admin</a> </li>  -->
                 <li class="d-none d-lg-inline-block"><a href="#" class="js-search-toggle"><span class="icon-search"></span></a></li>
                 <?php if(isset($_SESSION['user'])): ?>
-                    <li><a href="/"><abbr title="<?=$userInfo['name']?>"><img src="/upload/profile_image/<?=$userInfo['image']?>" style="width: 50px; height:50px; border-radius:50%; object-fit:cover;"></abbr></a></li>
+                    <li><a href="/user/profile/view/<?=$userInfo['id']?>"><abbr title="<?=$userInfo['name']?>"><img src="/upload/profile_image/<?=$userInfo['image']?>" style="width: 50px; height:50px; border-radius:50%; object-fit:cover;"></abbr></a></li>
                 <?php endif; ?>
               </ul>
             </nav>

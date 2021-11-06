@@ -8,11 +8,13 @@ class UserController
             unset($_SESSION['user']);
         }        
 
+        $bio = '';
         $name = '';
         $email = '';
         $password = '';
         $result = false;
         if(isset($_POST['submit'])){
+            $bio = $_POST['bio'] ?? '';
             $name = $_POST['name'];
             $email = $_POST['email'];
             $password = $_POST['password'];
@@ -89,7 +91,7 @@ class UserController
 
             if($errors == false){
                 
-                $_SESSION['user'] = User::register( $name, $email, $password, $image );
+                $_SESSION['user'] = User::register( $name, $email, $password, $image, $bio );
                 $_SESSION['name'] = $name;
                 // $_SESSION['products'] = [];
                 header("Location: /");
@@ -149,5 +151,15 @@ class UserController
         }
 
         header("Location: /");
+    }
+
+    public function actionProfileView($user_id)
+    {
+        $user = User::getUser($user_id);
+        $userPosts = User::getUserPosts($user_id);
+
+        require_once( ROOT . "/views/user/view.php");
+
+        return true;
     }
 }

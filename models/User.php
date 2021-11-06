@@ -2,20 +2,21 @@
 
 class User
 {
-    public static function register( $name, $email, $password, $image )
+    public static function register( $name, $email, $password, $image, $bio )
     {
         $db = Db::getConnection();
         // Hash password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
-        $sql = "INSERT INTO users (name, email, password, image)
-                VALUES (:name, :email, :password, :image)"; 
+        $sql = "INSERT INTO users (name, email, password, image, bio)
+                VALUES (:name, :email, :password, :image, :bio)"; 
 
         $result = $db->prepare($sql);
         $result->bindParam(':name', $name, PDO::PARAM_STR);
         $result->bindParam(':email', $email, PDO::PARAM_STR);
         $result->bindParam(':password', $hashed_password, PDO::PARAM_STR);
         $result->bindParam(':image', $image, PDO::PARAM_STR);
+        $result->bindParam(':bio', $bio, PDO::PARAM_STR);
         $result->execute();
         
         $data = $db->query('SELECT id FROM users WHERE email="'.$email.'"');
@@ -96,5 +97,26 @@ class User
         $result = $sql->fetch();
         
         return $result;
+    }
+
+    public static function getTeamUsers()
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT * FROM users WHERE roll = 'admin' OR roll = 'operator'";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        
+        return $result->fetchAll();       
+    }
+
+    public static function getUserPosts($user_id)
+    {
+        $db = Db::getConnection();
+
+        $sql = "SELECT * FROM posts WHERE user_id = $user_id";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetchAll();
     }
 }

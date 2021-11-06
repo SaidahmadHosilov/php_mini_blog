@@ -2,6 +2,48 @@
 
 class PostController
 {
+    public function actionDeleteComment($comment_id)
+    {
+        $postId = Post::getPostIdBeforeDeletingComment($comment_id);
+        if( Post::deleteComment($comment_id) ){
+            header('Location: /post/details/' . $postId['post_id']);
+            die;
+        }
+        header("Location: /");
+        die;
+    }
+    public function actionCreateComment()
+    {
+        $arr = array();
+        $comment = $_POST['comment'] ?? '';
+        $userId = $_POST['user_id'] ?? '';
+        $date = date('Y-m-d H:i:s');
+        $postId = $_POST['post'] ?? '';
+
+        $commentsData = Post::insertDataComment($userId, $date, $comment, $postId);
+        $countComment = Post::countComments($postId);
+        
+        array_push($arr, $commentsData);
+        array_push($arr, $countComment);
+
+        echo json_encode($arr);
+        exit;
+    }
+
+    public function actionView($id)
+    {
+        $mainBlogs = Blog::getBlogsByLimit(4);
+        $currentPost = Post::getCurrentPost($id);
+        $popularPosts = Post::getPopularPosts(3);
+        $categories = Post::getCategoriesList();
+        $tags = Post::getTagsList();
+        $comments = Post::getCurrentComments($id);
+        $countComment = Post::countComments($id);    
+
+        require_once( ROOT . '/views/post/details.php' );
+
+        return true;
+    }
     public function actionCreate()
     {
         $title = '';
@@ -15,7 +57,7 @@ class PostController
 
             $title = $_POST['title'] ?? '';
             $text = $_POST['text'] ?? '';
-            $mainText = base64_encode($_POST['post-content']) ?? '';
+            $mainText = $_POST['post-content'] ?? '';
             $ctgName = $_POST['ctg_name'] ?? '';
             $tagName = $_POST['tag_name'] ?? '';
             $image = $_FILES['image']['name'] == '' ? 'no-post.png' : $_FILES['image']['name'];

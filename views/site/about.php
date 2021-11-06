@@ -44,42 +44,21 @@
         </div>
         </div>
         <div class="row">
-        <div class="col-md-6 col-lg-4 mb-5 text-center">
-            <img src="/template/images/person_1.jpg" alt="Image" class="img-fluid w-50 rounded-circle mb-4">
-            <h2 class="mb-3 h5">Kate Hampton</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum neque nobis eos quam necessitatibus rerum aliquid est tempore, cupiditate iure at voluptatum dolore, voluptates. Debitis accusamus, beatae ipsam excepturi mollitia.</p>
+            <?php foreach($team as $person): ?>
+                <div class="col-md-6 col-lg-4 mb-5 text-center">
+                    <img src="/upload/profile_image/<?=$person['image']?>" alt="Image" 
+                    class="rounded-circle mb-4"
+                    style="width: 130px; height: 130px; object-fit:cover;">
+                    <h2 class="mb-3 h5"><?=$person['name']?></h2>
+                    <p><?=$person['bio']?></p>
 
-            <p class="mt-5">
-            <a href="#" class="p-3"><span class="icon-facebook"></span></a>
-            <a href="#" class="p-3"><span class="icon-instagram"></span></a>
-            <a href="#" class="p-3"><span class="icon-twitter"></span></a>
-            </p>
-        </div>
-
-        <div class="col-md-6 col-lg-4 mb-5 text-center">
-            <img src="/template/images/person_2.jpg" alt="Image" class="img-fluid w-50 rounded-circle mb-4">
-            <h2 class="mb-3 h5">Richard Cook</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum neque nobis eos quam necessitatibus rerum aliquid est tempore, cupiditate iure at voluptatum dolore, voluptates. Debitis accusamus, beatae ipsam excepturi mollitia.</p>
-
-            <p class="mt-5">
-            <a href="#" class="p-3"><span class="icon-facebook"></span></a>
-            <a href="#" class="p-3"><span class="icon-instagram"></span></a>
-            <a href="#" class="p-3"><span class="icon-twitter"></span></a>
-            </p>
-        </div>
-
-        <div class="col-md-6 col-lg-4 mb-5 text-center">
-            <img src="/template/images/person_3.jpg" alt="Image" class="img-fluid w-50 rounded-circle mb-4">
-            <h2 class="mb-3 h5">Kevin Peters</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum neque nobis eos quam necessitatibus rerum aliquid est tempore, cupiditate iure at voluptatum dolore, voluptates. Debitis accusamus, beatae ipsam excepturi mollitia.</p>
-
-            <p class="mt-5">
-            <a href="#" class="p-3"><span class="icon-facebook"></span></a>
-            <a href="#" class="p-3"><span class="icon-instagram"></span></a>
-            <a href="#" class="p-3"><span class="icon-twitter"></span></a>
-            </p>
-        </div>
-        </div>
+                    <p class="mt-5">
+                    <a href="#" class="p-3"><span class="icon-facebook"></span></a>
+                    <a href="#" class="p-3"><span class="icon-instagram"></span></a>
+                    <a href="#" class="p-3"><span class="icon-twitter"></span></a>
+                    </p>
+                </div>
+            <?php endforeach; ?>
     </div>
     </div>
     
