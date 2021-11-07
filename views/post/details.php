@@ -58,7 +58,7 @@
                             ?>
                                 <p>
                                     <a href="/post/comment/delete/<?=$comment['id']?>" class="delete btn btn-sm btn-danger rounded">Delete</a>
-                                    <a href="#" class="delete btn btn-sm btn-secondary rounded">Edit</a>
+                                    <a href="/comment/edit/<?=$comment['id']?>/<?=$currentPost['id']?>" class="btn btn-sm btn-secondary rounded">Edit</a>
                                 </p>
                             <?php endif; ?>
                             <!-- <p><a href="#" class="reply rounded">Reply</a></p> -->
@@ -225,7 +225,7 @@
             <h3 class="heading">Categories</h3>
             <ul class="categories">
                 <?php foreach($categories as $ctg): ?>
-                    <li><a href="#"><?=$ctg['name']?></a></li>
+                    <li><a href="/category/<?=$ctg['id']?>"><?=$ctg['name']?></a></li>
                 <?php endforeach; ?>
                 <!-- <li><a href="#">Adventure <span>(14)</span></a></li> -->
             </ul>

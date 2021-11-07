@@ -119,4 +119,46 @@ class User
 
         return $result->fetchAll();
     }
+
+    public static function updateUserData($user_id, $name, $image, $bio)
+    {
+        $db = Db::getConnection();
+        $sql = "UPDATE users SET name = '$name', image = '$image', bio = '$bio' WHERE id = $user_id";
+        $result = $db->query($sql);
+
+        return true;
+    }
+
+    public static function deleteAccount($user_id)
+    {
+        $user_id = intval($user_id);
+        $db = Db::getConnection();
+        $photos = $db->query("SELECT image FROM posts WHERE user_id = $user_id");
+        $photos->setFetchMode(PDO::FETCH_ASSOC);
+        $photos = $photos->fetchAll();
+
+        foreach($photos as $photo) {
+            if( $photo['image'] != 'no-post.png' ) {
+                unlink('upload/profile_image/' . $photo['image']);
+            }
+        }
+
+        $userImage = $db->query("SELECT image FROM users WHERE id = $user_id");
+        $userImage->setFetchMode(PDO::FETCH_ASSOC);
+        $userImage = $userImage->fetch();
+
+        if( $userImage['image'] != 'no-image.png' ) {
+            unlink('upload/profile_image/' . $userImage['image']);
+        }
+
+        $db->query("DELETE FROM comments WHERE user_id = $user_id");
+        $db->query("DELETE FROM posts WHERE user_id = $user_id");
+        $db->query("DELETE FROM users WHERE id = $user_id");
+        
+        if(isset($_SESSION['user'])){
+            unset($_SESSION['user']);
+        }
+
+        return true;
+    }
 }

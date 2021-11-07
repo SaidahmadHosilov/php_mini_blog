@@ -157,9 +157,108 @@ class UserController
     {
         $user = User::getUser($user_id);
         $userPosts = User::getUserPosts($user_id);
+        $currentUser = $_SESSION['user'] ?? '';
 
         require_once( ROOT . "/views/user/view.php");
 
         return true;
+    }
+
+    public function actionProfileEdit($user_id)
+    {
+        $user = User::getUser($user_id);
+
+        if($_SESSION['user'] != $user_id){
+            echo "404 Not Found";
+            exit;
+        }
+
+        $bio = '';
+        $name = '';
+        if(isset($_POST['submit'])){
+            $bio = $_POST['bio'] ?? '';
+            $name = $_POST['name'] ?? '';
+
+            $image = $_FILES['image']['name'] == '' ? $user['image'] : $_FILES['image']['name'];
+            $oldPhoto = $user['image'];
+
+            $errors = false;
+            if(!User::checkName($name)){
+                $errors['name'] = 'Ism 4 ta yoki undan ko\'p belgiga ega bo\'lishi kerak';
+            }
+
+            if($image != $user['image']){
+                // image upload
+                $target_dir = "upload/profile_image/";
+                $target_file = $target_dir . basename($image);
+                $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+
+                if( $_FILES['image']['name'] != '' ){
+                    // Check if image file is a actual image or fake image
+                    if(isset($_POST["submit"]) && empty($_FILES["image"])) {
+                        $check = getimagesize($_FILES["image"]["tmp_name"]);
+                        if($check !== false) {
+                            $errors["image"] = "Bu rasm - " . $check["mime"] . ".";
+                        } else {
+                            $errors["image"] = "Bu rasm emas!";
+                        }
+                    }
+
+                    // Check if file already exists
+                    if (file_exists($target_file)) {
+                        $errors["image"] = "Kechirasiz, bunday rasm mavjud!";
+                    }
+
+                    // Check file size
+                    if ($_FILES["image"]["size"] > 5000000) {
+                        $errors["image"] = "Kechirasiz, sizning rasmingiz katta hajmli!";
+                    }
+
+                    // Allow certain file formats
+                    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                    && $imageFileType != "gif" ) {
+                        $errors["image"] = "Kechirasiz, faqat JPG, JPEG, PNG & GIF tiplarni ishlatish mumkin.";
+                        $uploadOk = 0;
+                    }
+
+                    // Check if $uploadOk is set to 0 by an error
+                    if (!empty($errors["image"])) {
+                        echo "Kechirasiz, rasm yuklanmadi, qaytadan urinib ko'ring!";
+                        // if everything is ok, try to upload file
+                    } else {
+                        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                            echo "Was done!";
+                            // echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+                        } else {
+                            echo "Sorry!";
+                            // echo "Sorry, there was an error uploading your file.";
+                        }
+                    }
+                }
+                
+                if(file_exists('upload/profile_image/' . basename($oldPhoto))){
+                    unlink('upload/profile_image/' . basename($oldPhoto));
+                }
+                //image upload finish
+            } 
+
+            if($errors == false){
+                
+                User::updateUserData($user['id'], $name, $image, $bio);
+                header("Location: /user/profile/view/" . $user['id']);
+            }
+        }
+
+        require_once( ROOT . "/views/user/edit.php");
+
+        return true;
+    }
+
+    public function actionProfileDelete($user_id)
+    {
+        User::deleteAccount(intval($user_id));
+
+        header("Location: /");
+        exit;
     }
 }

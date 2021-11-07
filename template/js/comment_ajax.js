@@ -31,7 +31,7 @@ function leaveCommentToPost(e)
                                         '<p>'+comments[0][i].text+'</p>'+
                                         '<p>'+
                                             '<a href="/post/comment/delete/'+comments[0][i].id+'" class="delete btn btn-sm btn-danger mr-2 rounded">Delete</a>'+
-                                            '<a href="#" class="delete btn btn-sm btn-secondary rounded">Edit</a>'+
+                                            '<a href="/comment/edit/'+comments[0][i].id+'/'+comments[2]+'" class="btn btn-sm btn-secondary rounded">Edit</a>'+
                                         '</p>'+
                                     '</div>'+
                                 '</li>';

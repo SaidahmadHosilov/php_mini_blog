@@ -37,22 +37,30 @@
                     if(!empty($userPosts)):
                         foreach($userPosts as $post):
                 ?> 
-                            <li>
-                                <a href="/post/details/<?=$post['id']?>" class="d-flex align-items-center">
-                                <img src="/upload/profile_image/<?=$post['image']?>" alt="Image placeholder" 
-                                class="mr-4" style="max-width: 100px; height: 80px; object-fit:cover;">
-                                <div class="text">
-                                    <h4><?=$post['title']?></h4>
-                                    <div class="post-meta">
-                                    <span class="mr-2">
-                                        <?php 
-                                            echo date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))." ";
-                                            echo date( 'm', strtotime($post['created_at'])) . ", ";
-                                            echo date( 'Y', strtotime($post['created_at']));
-                                        ?>
-                                    </span>
+                            <li class="d-flex justify-content-between">
+                                <div class="post-left-div">
+                                    <a href="/post/details/<?=$post['id']?>" class="d-flex align-items-center">
+                                    <img src="/upload/profile_image/<?=$post['image']?>" alt="Image placeholder" 
+                                    class="mr-4" style="max-width: 100px; height: 80px; object-fit:cover;">
+                                    <div class="text">
+                                        <h4><?=$post['title']?></h4>
+                                        <div class="post-meta">
+                                        <span class="mr-2">
+                                            <?php 
+                                                echo date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))." ";
+                                                echo date( 'm', strtotime($post['created_at'])) . ", ";
+                                                echo date( 'Y', strtotime($post['created_at']));
+                                            ?>
+                                        </span>
+                                        </div>
                                     </div>
                                 </div>
+                                <?php if($currentUser == $user['id']): ?>
+                                    <div class="post-right-div d-flex align-items-center">
+                                        <a href="/post/edit/<?=$post['id']?>" class="btn btn-primary mr-2">Edit</a>
+                                        <a href="/post/delete/<?=$post['id']?>" class="btn btn-danger" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                                    </div>
+                                <?php endif; ?>
                                 </a>
                             </li>
                 <?php
@@ -65,12 +73,11 @@
         </div>
     </div>
     <?php 
-        $currentUser = $_SESSION['user'] ?? '';
         if($currentUser == $user['id']): 
     ?>
         <div class="row">
-            <a href="" class="btn btn-primary mr-3">Edit Your Profile</a>
-            <a href="" class="btn btn-danger">Delete Your Profile</a>
+            <a href="/user/profile/edit/<?=$currentUser?>" class="btn btn-primary mr-3">Edit Your Profile</a>
+            <a href="/user/profile/delete/<?=$currentUser?>" onclick="return confirm('Are you sure to delete?')" class="btn btn-danger">Delete Your Profile</a>
         </div>
     <?php endif; ?>
 </div>

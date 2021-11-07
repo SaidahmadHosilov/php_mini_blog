@@ -2,6 +2,33 @@
 
 class Post
 {
+    public static function deletePost($post_id)
+    {
+        $db = Db::getConnection();
+        $photo = ($db->query("SELECT image FROM posts WHERE id = $post_id"));
+        $photo->setFetchMode(PDO::FETCH_ASSOC);
+        $photo = $photo->fetch();
+
+        if($photo['image'] != 'no-post.png'){
+            unlink('upload/profile_image/' . $photo['image']);
+        }
+
+        $sql = "DELETE FROM posts WHERE id = $post_id";
+        $result = $db->query($sql);
+        
+        return true;
+    }
+
+    public static function updatePostData( $post_id, $title, $text, $main_text, $image, $ctg_name, $tag_name)
+    {
+        $db = Db::getConnection();
+
+        $sql = "UPDATE posts SET title = '$title', text = '$text', main_text = '$main_text',
+        image = '$image', tag_name = '$tag_name', ctg_name = '$ctg_name' WHERE id = $post_id";
+
+        $result = $db->query($sql);
+        return $result;
+    }
     public static function getPostIdBeforeDeletingComment($comment_id)
     {
         $db = Db::getConnection();
@@ -146,7 +173,7 @@ class Post
         
         $result = $db->query("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
         users.name, users.image from comments inner join users 
-        on users.id = comments.user_id where comments.post_id = $postId");
+        on users.id = comments.user_id where comments.post_id = $postId order by time desc");
 
         $i = 0;
 
@@ -171,7 +198,7 @@ class Post
         $db = Db::getConnection();
         $sql = ("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
         users.name, users.image from comments inner join users 
-        on users.id = comments.user_id where comments.post_id = $postId");
+        on users.id = comments.user_id where comments.post_id = $postId ORDER BY time DESC");
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
 

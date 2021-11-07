@@ -85,7 +85,7 @@
             <h3 class="heading">Categories</h3>
             <ul class="categories">
                 <?php foreach($categories as $ctg): ?>
-                    <li><a href="#"><?=$ctg['name']?></a></li>
+                    <li><a href="/category/<?=$ctg['id']?>"><?=$ctg['name']?></a></li>
                 <?php endforeach; ?>
                 <!-- <li><a href="#">Adventure <span>(14)</span></a></li> -->
             </ul>

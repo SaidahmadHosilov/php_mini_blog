@@ -4,6 +4,7 @@ if(isset($_SESSION['user'])){
   $userInfo = User::getUser($_SESSION['user']);
 }
 
+$categories = Post::getCategoriesList();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +25,10 @@ if(isset($_SESSION['user'])){
     <link rel="stylesheet" href="/template/fonts/flaticon/font/flaticon.css">
     <link rel="stylesheet" href="/template/css/aos.css">
     <link rel="stylesheet" href="/template/css/tags.css">
+    <!-- Pagination -->
+    <link rel="stylesheet" href="/components/pagination/css/pagination.css">
+    <link rel="stylesheet" href="/components/pagination/css/A_green.css">
+    <!-- Pagination -->
 
     <link rel="stylesheet" href="/template/css/style.css">
   </head>
@@ -56,10 +61,18 @@ if(isset($_SESSION['user'])){
 
           <div class="col-8 text-right">
             <nav class="site-navigation" role="navigation">
-              <ul class="site-menu js-clone-nav mr-auto d-none d-lg-block mb-0">
+              <ul class="site-menu js-clone-nav mr-auto p-0 d-none d-lg-block mb-0">
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
                 <li><a href="/contact">Contact</a></li>
+                <li class="drop-menu-ctg">
+                  <a >Categories &#10136;</a>
+                  <div>
+                    <?php foreach($categories as $ctg): ?>
+                      <a href="/category/<?=$ctg['id']?>/"> <?=$ctg['name']?> </a>
+                    <?php endforeach; ?>
+                  </div>
+                </li>
                 <?php if(isset($_SESSION['user'])): ?>
                     <li><a href="/post/create">Posts</a></li>
                     <li><a href="/logout"> Logout </a></li>

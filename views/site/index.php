@@ -1,7 +1,7 @@
 <!-- Header -->
 <?php require_once( ROOT . '/views/layouts/header.php' ); ?>
 <!-- !Header -->
-    
+
     <div class="site-section bg-light">
       <div class="container">
         <div class="row align-items-stretch retro-layout-2">
@@ -51,7 +51,7 @@
                           style="width: 50px; height: 50px; object-fit:cover;">
                     </figure>
                   </a>
-                  <span class="d-inline-block mt-1">By <a href="#"><?=$post['user_name']?></a></span>
+                  <span class="d-inline-block mt-1">By <a href="#"><?=$post['name']?></a></span>
                   <span>&nbsp;-&nbsp; <?=date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))?> <?= date( 'm', strtotime($post['created_at'])) ?>, <?= date( 'Y', strtotime($post['created_at'])) ?></span>
                 </div>
                 
@@ -64,15 +64,12 @@
           
         </div>
         <div class="row text-center pt-5 border-top">
-          <div class="col-md-12">
-            <div class="custom-pagination">
-              <span>1</span>
-              <a href="#">2</a>
-              <a href="#">3</a>
-              <a href="#">4</a>
-              <span>...</span>
-              <a href="#">15</a>
-            </div>
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <?php
+              echo "<div id='pagingg' >";
+              echo pagination($statementCount,$limit,$page);
+              echo "</div>";
+            ?>
           </div>
         </div>
       </div>
