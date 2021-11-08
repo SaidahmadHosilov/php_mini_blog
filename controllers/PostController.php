@@ -2,6 +2,20 @@
 
 class PostController
 {
+    public function actionSearch()
+    {
+        $title = $_POST['post_title'] ?? '';
+
+        $result = Post::searchAjax($title);
+
+        if(empty($result)){
+            $result = ['There is no result'];
+        }
+
+        echo json_encode($result);
+        exit;
+    }
+
     public function actionDeletePost($post_id)
     {
         $db = Db::getConnection();

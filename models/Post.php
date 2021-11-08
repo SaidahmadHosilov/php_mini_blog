@@ -2,6 +2,17 @@
 
 class Post
 {
+    public static function searchAjax($title)
+    {
+        $title = (string)($title);
+        $db = Db::getConnection();
+        $sql = "SELECT * FROM posts WHERE title LIKE '%$title%'";
+        $result = $db->query($sql);
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+
+        return $result->fetchAll();        
+    }
+
     public static function deletePost($post_id)
     {
         $db = Db::getConnection();
@@ -9,7 +20,7 @@ class Post
         $photo->setFetchMode(PDO::FETCH_ASSOC);
         $photo = $photo->fetch();
 
-        if($photo['image'] != 'no-post.png'){
+        if($photo['image'] != 'no-post.png' && $photo['image'] != 'no-image.png'){
             unlink('upload/profile_image/' . $photo['image']);
         }
 

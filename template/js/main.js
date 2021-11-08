@@ -284,3 +284,73 @@ $(function(){
 	});
 })
 
+// Debounce
+
+// var searchRequest = null;
+// var searchInput = $("#search-input");
+
+// var searchEvents = function() {
+//   if (searchRequest)
+//     searchRequest.abort()
+//   	searchRequest = $.get('/post/search', {term: $(this).val()}, null, 'script');
+// };
+
+// searchInput.on({
+//   change: searchEvents,
+//   keyup: $.debounce(500, searchEvents)
+// });
+
+
+const debounce = (fn, ms) => {
+	let timeout;
+	return function() {
+		const fnCall = () => { fn.apply(this, arguments) }
+		clearTimeout(timeout);
+		timeout = setTimeout(fnCall, ms)
+	}
+}
+onChange = debounce(onChange, 500);
+
+document.getElementById('search-input').addEventListener('keyup', onChange);
+
+function onChange(e){
+	e.preventDefault();
+	let searchVal = e.target.value;
+	var searchResult = document.querySelector('#search_result ul');
+	var params = "post_title=" + searchVal;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', '/post/search', true);
+	xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+
+	xhr.onload = function(){
+		if(this.status == 200){
+			var result = JSON.parse(this.responseText); 
+			console.log(result);
+			var output = '';
+			for(const i in result){
+				if(result != 'There is no result' && searchVal.length != 0){
+					output +=   '<li>'+
+									'<a href="/post/details/'+result[i].id+'" style="display: flex; align-items:center;">'+
+										'<img src="/upload/profile_image/'+result[i].image+'" style="width:120px;height:150px;object-fit:cover; padding-right:20px;">'+
+										'<div class="ml-3" style="width:100%;">'+
+											'<h5 class="my-2">'+result[i].title+'</h5>'+
+											'<p>'+result[i].text+'</p>'+
+										'</div>'+
+									'</a>'+
+								'</li>';
+				} else {
+					output += "No Result Found!";
+					continue;
+				}
+			}
+
+			searchResult.innerHTML = output;
+		} else {
+			console.log("Page Not Found")
+		}
+	}
+	xhr.send(params);
+}
+
+// Debounce

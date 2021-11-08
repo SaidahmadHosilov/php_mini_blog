@@ -19,6 +19,7 @@ return array(
     'post/details/([0-9]+)' => 'post/view/$1',
     'post/edit/([0-9]+)' => 'post/editPost/$1',
     'post/delete/([0-9]+)' => 'post/deletePost/$1',
+    'post/search' => 'post/search',
     'post/create' => 'post/create',
     // post
 
