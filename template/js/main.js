@@ -330,12 +330,12 @@ function onChange(e){
 			var output = '';
 			for(const i in result){
 				if(result != 'There is no result' && searchVal.length != 0){
-					output +=   '<li>'+
+					output +=   '<li class="mb-2">'+
 									'<a href="/post/details/'+result[i].id+'" style="display: flex; align-items:center;">'+
-										'<img src="/upload/profile_image/'+result[i].image+'" style="width:120px;height:150px;object-fit:cover; padding-right:20px;">'+
+										'<img src="/upload/profile_image/'+result[i].image+'" style="width:100px;height:100px;object-fit:cover; padding-right:20px;">'+
 										'<div class="ml-3" style="width:100%;">'+
-											'<h5 class="my-2">'+result[i].title+'</h5>'+
-											'<p>'+result[i].text+'</p>'+
+											'<h5 class="my-2 search-title">'+result[i].title+'</h5>'+
+											'<p class="search-text" style="color:grey">'+result[i].text+'</p>'+
 										'</div>'+
 									'</a>'+
 								'</li>';

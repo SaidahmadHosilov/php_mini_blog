@@ -1,24 +1,32 @@
 <!-- Header -->
 <?php require_once( ROOT . '/views/layouts/header.php' ); ?>
 <!-- !Header -->
+    <div class="col-md-7 mb-5 m-auto">
+        <form action="#" method="POST" class="p-5 bg-white">
 
-<form action="" method="post" class="container my-5">
-    <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input type="email" value="<?=$email?>" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
-        <span><?=$errors['email'] ?? ''?></span>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <label class="text-black" for="email">Email address</label> 
+                        <input type="email" id="email" class="form-control" name="email">
+                    </div>
+                </div>
+
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <label class="text-black" for="password">Password</label> 
+                    <input type="password" id="password" name="password" class="form-control">
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-12 mt-3">
+                    <input type="submit" name="submit" value="Submit" class="btn btn-primary mr-2 py-2 px-4 text-white">
+                    <a href="/register" class="btn btn-primary py-2 mr-2 px-4 text-white">Register</a>
+                    <a href="/" class="btn btn-primary py-2 px-4 mr-2 text-white">To Site</a>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input type="password" value="<?=$password?>" class="form-control" name="password" id="exampleInputPassword1">
-        <span><?=$errors['password'] ?? ''?></span>
-    </div>
-    <div class="row">
-        <button type="submit" name="submit" class="btn mx-3 btn-primary">Submit</button>
-        <a href="/register" class="btn btn-success">Register</a>
-        <a href="/" class="btn btn-warning mx-3">To Site</a>
-    </div>
-</form>
 
 <!-- Footer -->
 <?php require_once( ROOT . '/views/layouts/footer.php' ); ?>

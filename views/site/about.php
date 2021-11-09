@@ -46,11 +46,17 @@
         <div class="row">
             <?php foreach($team as $person): ?>
                 <div class="col-md-6 col-lg-4 mb-5 text-center">
-                    <img src="/upload/profile_image/<?=$person['image']?>" alt="Image" 
-                    class="rounded-circle mb-4"
-                    style="width: 130px; height: 130px; object-fit:cover;">
-                    <h2 class="mb-3 h5"><?=$person['name']?></h2>
-                    <p><?=$person['bio']?></p>
+                    <a href="/user/profile/view/<?=$person['id']?>">
+                        <img src="/upload/profile_image/<?=$person['image']?>" alt="Image" 
+                        class="rounded-circle mb-4"
+                        style="width: 184px; height: 184px; object-fit:cover;">
+                    </a>
+                    
+                    <a href="/user/profile/view/<?=$person['id']?>">
+                        <h2 class="mb-3 h5"><?=$person['name']?></h2>
+                    </a>
+
+                    <p class="about-bio"><?=$person['bio']?></p>
 
                     <p class="mt-5">
                     <a href="#" class="p-3"><span class="icon-facebook"></span></a>

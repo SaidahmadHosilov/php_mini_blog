@@ -54,7 +54,7 @@ $categories = Post::getCategoriesList();
                 <input type="text" id="search-input" class="form-control" placeholder="Search...">
                 <button class="search-btn" type="submit"><span class="icon-search"></span></button>
               </div>
-              <div id="search_result" style="border-top:1px solid grey;"> 
+              <div id="search_result" style="border-top:1px solid lightgrey;"> 
                 <ul style="list-style:none;" class="p-0">
                   
                 </ul>
@@ -63,7 +63,7 @@ $categories = Post::getCategoriesList();
           </div>
 
           <div class="col-4 site-logo">
-            <a href="/" class="text-black h2 mb-0">Mini Blog</a>
+            <a href="/" class="text-black h2 mb-0" style="font-weight: 700!important;">Mini Blog</a>
           </div>
 
           <div class="col-8 text-right">
@@ -73,19 +73,19 @@ $categories = Post::getCategoriesList();
                 <li><a href="/about">About</a></li>
                 <li><a href="/contact">Contact</a></li>
                 <li class="drop-menu-ctg">
-                  <a >Categories &#10136;</a>
+                  <a>Categories</a>
                   <div>
                     <?php foreach($categories as $ctg): ?>
-                      <a href="/category/<?=$ctg['id']?>/"> <?=$ctg['name']?> </a>
+                      <a href="/category/<?=$ctg['id']?>/" style="font-weight: 700!important;"> <?=$ctg['name']?> </a>
                     <?php endforeach; ?>
                   </div>
                 </li>
                 <?php if(isset($_SESSION['user'])): ?>
-                    <li><a href="/post/create">Posts</a></li>
-                    <li><a href="/logout"> Logout </a></li>
+                    <li><a href="/post/create"  style="font-weight: 700!important;">Posts</a></li>
+                    <li><a href="/logout"  style="font-weight: 700!important;"> Logout </a></li>
                 <?php else: ?>
-                    <li><a href="/login"> Login </a></li>
-                    <li><a href="/register"> Register </a></li>
+                    <li><a href="/login"  style="font-weight: 700!important;"> Login </a></li>
+                    <li><a href="/register"  style="font-weight: 700!important;"> Register </a></li>
                 <?php endif; ?>
                     <!-- <li><a href="/admin/"> Admin</a> </li>  -->
                 <li class="d-none d-lg-inline-block"><a href="#" class="js-search-toggle"><span class="icon-search"></span></a></li>

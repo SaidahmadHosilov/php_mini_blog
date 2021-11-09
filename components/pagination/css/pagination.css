@@ -33,7 +33,8 @@
 	align-items: center;
 	text-decoration:none;
 	padding:7px 10px 7px 10px;
-	font-size: 16px;	
+	font-size: 1rem;
+	font-weight: normal;	
 }
 
 #pagingg ul.pagination li a img{

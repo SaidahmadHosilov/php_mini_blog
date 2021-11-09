@@ -14,7 +14,7 @@
               <a href="/blog/details/<?=$blog['id']?>" class="h-entry mb-30 v-height gradient" style="background-image: url(<?=$blog['image']?>);">
                 <div class="text">
                   <h2><?=$blog['title']?></h2>
-                  <span class="date">July <?= $datetime->format('m') ?>, <?= $datetime->format('Y') ?></span>
+                  <span class="date">July <?= $datetime->format('d') ?>, <?= $datetime->format('Y') ?></span>
                 </div>
               </a>
             </div>
@@ -42,20 +42,20 @@
                 <div class="excerpt">
                 <span class="post-category text-white bg-secondary mb-3"><?=$post['ctg_name']?></span>
 
-                <h2><a href="/post/details/<?=$post['id']?>"><?=$post['title']?></a></h2>
+                <h2 class="post-title-h"><a href="/post/details/<?=$post['id']?>"><?=$post['title']?></a></h2>
                 <div class="post-meta align-items-center mb-3 d-flex text-left clearfix">
                   <a href="/user/profile/view/<?=$post['user_id']?>">
                     <figure class="author-figure d-flex align-items-center mb-0 mr-3 float-left">
                       <img src="/upload/profile_image/<?=$post['user_image']?>" 
                           alt="Image" class="img-fluid m-0"
-                          style="width: 50px; height: 50px; object-fit:cover;">
+                          style="width: 30px; height: 30px; object-fit:cover;">
                     </figure>
                   </a>
                   <span class="d-inline-block mt-1">By <a href="#"><?=$post['name']?></a></span>
-                  <span>&nbsp;-&nbsp; <?=date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))?> <?= date( 'm', strtotime($post['created_at'])) ?>, <?= date( 'Y', strtotime($post['created_at'])) ?></span>
+                  <span>&nbsp;-&nbsp; <?=date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))?> <?= date( 'd', strtotime($post['created_at'])) ?>, <?= date( 'Y', strtotime($post['created_at'])) ?></span>
                 </div>
                 
-                  <p><?= $post['text']?></p>
+                  <p class="post-short-desc"><?= $post['text']?></p>
                   <p><a href="/post/details/<?=$post['id']?>" >Read More</a></p>
                 </div>
               </div>

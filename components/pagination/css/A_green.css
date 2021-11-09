@@ -14,13 +14,13 @@
 	{
         color: #fff;
 		background: #2f89fc;
-		background:-moz-linear-gradient(top,#2f89fc,#0a74fd);
+		/* background:-moz-linear-gradient(top,#2f89fc,#0a74fd); */
 		background:-webkit-gradient(linear,0 0,0 100%,from(#2f89fc),to(#0a74fd));	
 	}	
 	
 	ul.pagination li a:hover,
 	ul.pagination li a.current
 	{
-		color:#000!important;
-		background:#E7F2C7;
+		color:#808080!important;
+		background:#fff;
 	}
