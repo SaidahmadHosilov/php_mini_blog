@@ -356,4 +356,23 @@ h1, h2, h3, h4, h5,
   }
 /* Drop menu */
 
+.post-title-h a, .search-title{
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+  }
   
+  .search-text{
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+  }
+  
+  .post-short-desc, .about-bio{
+	display: -webkit-box;
+	-webkit-line-clamp: 5;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+  }
