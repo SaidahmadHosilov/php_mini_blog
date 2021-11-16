@@ -172,7 +172,7 @@ class Post
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetchAll();
+        return $result->fetchAll() ;
     }
 
     public static function insertDataComment($userId, $time, $comment, $postId)
