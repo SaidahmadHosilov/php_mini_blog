@@ -146,31 +146,48 @@ class PostController
         $date = date('Y-m-d H:i:s');
         $postId = $_POST['post'] ?? '';
 
-        $commentsData = Post::insertDataComment($userId, $date, $comment, $postId);
+        $commentData = Post::insertDataComment($userId, $date, $comment, $postId);
         $countComment = Post::countComments($postId);
-        
-        array_push($arr, $commentsData);
-        array_push($arr, $countComment);
-        array_push($arr, $postId);
 
-        echo json_encode($arr);
+        $user = User::getUser($_SESSION['user']);
+        echo json_encode(['success', $user, date("Y-m-d H:i:s", time()), $commentData, $countComment]);
         exit;
     }
 
     public function actionView($id)
     {
-        $mainBlogs = Blog::getBlogsByLimit(4);
+        $posts = Post::getPostsByLimit(4);
         $currentPost = Post::getCurrentPost($id);
         $popularPosts = Post::getPopularPosts(3);
         $categories = Post::getCategoriesList();
         $tags = Post::getTagsList();
-        $comments = Post::getCurrentComments($id);
-        $countComment = Post::countComments($id);    
+        $comments = Post::getCurrentComments($id)[0];
+        $childrenComments = Post::getCurrentComments($id)[1];
+        $countComment = Post::countComments($id);
 
         require_once( ROOT . '/views/post/details.php' );
 
         return true;
     }
+
+    public static function actionShortMessages()
+    {
+        $comment = $_POST['comment'] ?? '';
+        $post_id = $_POST['post_id'] ?? '';
+        $user_session = $_POST['user_session'] ?? '';
+        $user_id = $_POST['user_id'] ?? '';
+
+        if($cmId = Post::insertShortComment($comment, $post_id, $user_session, $user_id)){
+            $user = User::getUser($user_session);
+            $countComment = Post::countComments($post_id);
+            echo json_encode(['success', $user, date("Y-m-d H:i:s", time()), $cmId, $countComment]);
+            exit;
+        } else {
+            echo json_encode(['error']);
+            exit;
+        }
+    }
+
     public function actionCreate()
     {
         $title = '';

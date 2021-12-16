@@ -42,13 +42,18 @@
             <div class="pt-5">
             <h3 class="mb-5"><span id="comment_count"><?= $countComment['total'] ?></span> Comments</h3>
             <ul class="comment-list" id="comment-container">
-
+                <?php if(isset($_SESSION['user'])): ?>
+                    <form method="POST" action="/post/shortmsg/" data-owner="<?=$_SESSION['user']?>" class="short-comment mt-2" data-post-id="<?=$currentPost['id']?>">
+                        <input class="doNotTouch" type="text" placeholder="reply...">
+                        <button type="submit" class="doNotTouch" id="short-comment-btn">send</button>
+                </form>
+                <?php endif; ?>
                 <?php foreach($comments as $comment): ?>
                     <li class="comment">
                         <div class="vcard">
                             <img src="/upload/profile_image/<?=$comment['image']?>" alt="Image placeholder">
                         </div>
-                        <div class="comment-body">
+                        <div class="comment-body" data-comment-id="<?=$comment['id']?>">
                             <h3><?=$comment['name']?></h3>
                             <div class="meta"><?=$comment['time']?></div>
                             <p><?=$comment['text']?></p>
@@ -56,26 +61,55 @@
                                 $user = $_SESSION['user'] ?? '';
                                 if($user == $comment['user_id'] ): 
                             ?>
-                                <p>
                                     <a href="/post/comment/delete/<?=$comment['id']?>" class="delete btn btn-sm btn-danger rounded">Delete</a>
-                                    <a href="/comment/edit/<?=$comment['id']?>/<?=$currentPost['id']?>" class="btn btn-sm btn-secondary rounded">Edit</a>
-                                </p>
+                                    <a href="/comment/edit/<?=$comment['id']?>/<?=$currentPost['id']?>" class="btn mr-1 btn-sm btn-secondary rounded">Edit</a>
+                            <?php 
+                                endif; 
+                                if($user != ''):
+                            ?>
+                            <a style="cursor: pointer;"
+                                data-user-id="<?=$comment['user_id']?>" 
+                                data-user-session="<?=$user?>" 
+                                class="reply pb-2 reply-btn pt-1 rounded doNotTouch">Reply</a>
+                            
                             <?php endif; ?>
-                            <!-- <p><a href="#" class="reply rounded">Reply</a></p> -->
                         </div>
+                        
+                        <ul class="children">
+                            <?php 
+                                foreach($childrenComments as $childCm):
+                                    if( $childCm['parent_id'] == $comment['id'] ): 
+                            ?>
+                                    <li class="comment">
+                                        <div class="vcard">
+                                            <img src="/upload/profile_image/<?=$childCm['image']?>" alt="Image placeholder">
+                                        </div>
+                                        <div class="comment-body">
+                                            <h3><?=$childCm['name']?></h3>
+                                            <div class="meta"><?=$childCm['time']?></div>
+                                            <p><?=$childCm['text']?></p>
+                                            <a href="/post/comment/delete/<?=$childCm['id']?>" class="delete btn btn-sm btn-danger rounded">Delete</a>
+                                            <a href="/comment/edit/<?=$childCm['id']?>/<?=$currentPost['id']?>" class="btn mr-1 btn-sm btn-secondary rounded">Edit</a>
+                                        </div>
+                                    </li>
+                            <?php 
+                                    endif;
+                                endforeach; 
+                            ?>
+                        </ul>
                     </li>
                 <?php endforeach; ?>
 
                 <!-- <li class="comment">
-                <div class="vcard">
-                    <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                </div>
-                <div class="comment-body">
-                    <h3>Jean Doe</h3>
-                    <div class="meta">January 9, 2018 at 2:21pm</div>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                    <p><a href="#" class="reply rounded">Reply</a></p>
-                </div> -->
+                    <div class="vcard">
+                        <img src="/template/images/person_1.jpg" alt="Image placeholder">
+                    </div>
+                    <div class="comment-body">
+                        <h3>Jean Doe</h3>
+                        <div class="meta">January 9, 2018 at 2:21pm</div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
+                        <p><a href="#" class="reply rounded">Reply</a></p>
+                    </div> -->
 
                 <!-- <ul class="children">
                     <li class="comment">
@@ -118,8 +152,8 @@
                         </li>
                     </ul>
                     </li>
-                </ul>
-                </li> -->
+                </ul> -->
+                <!-- </li> -->
 
                 <!-- <li class="comment">
                     <div class="vcard">
@@ -132,7 +166,7 @@
                         <p><a href="#" class="reply rounded">Reply</a></p>
                     </div>
                 </li> -->
-            </ul>
+                </ul>
             <!-- END comment-list -->
             
             <div class="comment-form-wrap pt-5">
@@ -259,38 +293,38 @@
         <div class="row align-items-stretch retro-layout">
 
           <div class="col-md-5 order-md-2">
-            <a href="/blog/details/<?=$mainBlogs[0]['id']?>" class="hentry img-1 h-100 gradient" style="background-image: url('<?=$mainBlogs[0]['image']?>');">
-              <span class="post-category text-white bg-danger"><?=$mainBlogs[0]['name']?></span>
+            <a href="/post/details/<?=$posts[0]['id']?>" class="hentry img-1 h-100 gradient" style="background-image: url('/upload/profile_image/<?=$posts[0]['image']?>');">
+              <span class="post-category text-white bg-danger"><?=$posts[0]['ctg_name']?></span>
               <div class="text">
-                <h2><?=$mainBlogs[0]['title']?></h2>
-                <span><?=$mainBlogs[0]['time']?></span>
+                <h2><?=$posts[0]['title']?></h2>
+                <span><?=$posts[0]['created_at']?></span>
               </div>
             </a>
           </div>
 
           <div class="col-md-7">
             
-            <a href="/blog/details/<?=$mainBlogs[1]['id']?>" class="hentry img-2 v-height mb30 gradient" style="background-image: url('<?=$mainBlogs[1]['image']?>');">
-              <span class="post-category text-white bg-success"><?=$mainBlogs[1]['name']?></span>
+            <a href="/post/details/<?=$posts[1]['id']?>" class="hentry img-2 v-height mb30 gradient" style="background-image: url('/upload/profile_image/<?=$posts[1]['image']?>');">
+              <span class="post-category text-white bg-success"><?=$posts[1]['ctg_name']?></span>
               <div class="text text-sm">
-                <h2><?=$mainBlogs[1]['title']?></h2>
-                <span><?=$mainBlogs[1]['time']?></span>
+                <h2><?=$posts[1]['title']?></h2>
+                <span><?=$posts[1]['created_at']?></span>
               </div>
             </a>
             
             <div class="two-col d-block d-md-flex">
-              <a href="/blog/details/<?=$mainBlogs[2]['id']?>" class="hentry v-height img-2 gradient" style="background-image: url('<?=$mainBlogs[2]['image']?>');">
-                <span class="post-category text-white bg-primary"><?=$mainBlogs[2]['name']?></span>
+              <a href="/post/details/<?=$posts[2]['id']?>" class="hentry v-height img-2 gradient" style="background-image: url('/upload/profile_image/<?=$posts[2]['image']?>');">
+                <span class="post-category text-white bg-primary"><?=$posts[2]['ctg_name']?></span>
                 <div class="text text-sm">
-                  <h2><?=$mainBlogs[2]['title']?></h2>
-                  <span><?=$mainBlogs[2]['time']?></span>
+                  <h2><?=$posts[2]['title']?></h2>
+                  <span><?=$posts[2]['created_at']?></span>
                 </div>
               </a>
-              <a href="/blog/details/<?=$mainBlogs[3]['id']?>" class="hentry v-height img-2 ml-auto gradient" style="background-image: url('<?=$mainBlogs[3]['image']?>');">
-                <span class="post-category text-white bg-warning"><?=$mainBlogs[3]['name']?></span>
+              <a href="/post/details/<?=$posts[3]['id']?>" class="hentry v-height img-2 ml-auto gradient" style="background-image: url('/upload/profile_image/<?=$posts[3]['image']?>');">
+                <span class="post-category text-white bg-warning"><?=$posts[3]['ctg_name']?></span>
                 <div class="text text-sm">
-                  <h2><?=$mainBlogs[3]['title']?></h2>
-                  <span><?=$mainBlogs[3]['time']?></span>
+                  <h2><?=$posts[3]['title']?></h2>
+                  <span><?=$posts[3]['created_at']?></span>
                 </div>
               </a>
             </div>  
@@ -318,6 +352,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Footer -->
 <?php require_once( ROOT . '/views/layouts/footer.php' ); ?>

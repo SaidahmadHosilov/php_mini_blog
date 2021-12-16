@@ -27,6 +27,23 @@ class User
         return $row['id'];
     }
 
+    public static function storeSocial($array, $user_id) // [1] => 'tele', [3] => 'face'
+    {
+        $db = Db::getConnection();
+        $sql = "INSERT INTO user_socials(social_id, user_id, link) 
+                VALUES(:social_id, :user_id, :link)";
+        $stmt = $db->prepare($sql);
+
+        foreach ($array as $social_id => $link) {
+            $stmt->bindParam(':social_id',  $social_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id',  $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':link', $link, PDO::PARAM_STR);
+            $stmt->execute();
+        }
+
+        return true;
+    }
+
     public static function checkName($name)
     {
         if(strlen($name) > 3){
@@ -99,14 +116,36 @@ class User
         return $result;
     }
 
+
     public static function getTeamUsers()
     {
         $db = Db::getConnection();
-        $sql = "SELECT * FROM users WHERE roll = 'admin' OR roll = 'operator'";
-        $result = $db->query($sql);
+        $socials = array();
+
+        $sql = "SELECT * FROM users WHERE role = 'admin' OR role = 'operator'";
+        $result = $db->prepare($sql);
+        $result->execute();
         $result->setFetchMode(PDO::FETCH_ASSOC);
+        $users = $result->fetchAll();
+        $i = 0;
+
+        foreach ($users as $user){
+            $stmt = $db->prepare("SELECT * FROM user_socials
+                                  INNER JOIN socials 
+                                  ON user_socials.social_id = socials.id 
+                                  WHERE user_id = :user_id");
+            $stmt->bindParam('user_id', $user['id'], PDO::PARAM_STR);
+            $stmt->execute();
+            $socials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if(count($socials)){
+                $user['socials'] = $socials;
+                $users[$i] = $user;
+            }
+            $i++;
+        }
         
-        return $result->fetchAll();       
+        return $users;       
     }
 
     public static function getUserPosts($user_id)
@@ -157,6 +196,67 @@ class User
         
         if(isset($_SESSION['user'])){
             unset($_SESSION['user']);
+        }
+
+        return true;
+    }
+
+    public static function isExistLinks($user_id)
+    {
+        $db = Db::getConnection();
+        $arr = [];
+        
+        $sql = "SELECT * FROM user_socials WHERE user_id = :user_id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam('user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $i = 0;
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $arr[$i]['id'] = $row['id'];
+            $arr[$i]['social_id'] = $row['social_id'];
+            $arr[$i]['link'] = $row['link'];
+            $i++;
+        }
+
+        return $arr;
+    }
+
+    public static function addOrUpdateLinks($user_id, $links)// [1] => telegeram, [2] => facebook 
+    {
+        $db = Db::getConnection();
+        $sql = "SELECT social_id FROM user_socials WHERE user_id = :user_id";
+        $statement = $db->prepare($sql);
+        $statement->bindParam('user_id', $user_id, PDO::PARAM_INT);
+        $statement->execute();
+
+        $social_ids = [];
+        $i = 0;
+
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
+            $social_ids[$i] = $row['social_id'];
+            $i++;
+        }
+
+        foreach ($links as $key => $value) {
+            if(in_array($key, $social_ids)){
+                $stmt = $db->prepare("UPDATE user_socials 
+                              SET link = :link 
+                              WHERE user_id = :user_id 
+                              AND social_id = :social_id");
+                $stmt->bindParam(':link', $value, PDO::PARAM_STR);
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt->bindParam(':social_id', $key, PDO::PARAM_INT);
+                $stmt->execute();
+            } else {
+                $stmt2 = $db->prepare("INSERT INTO user_socials(social_id, user_id, link) 
+                                     VALUES( :social_id, :user_id, :link)"); 
+                $stmt2->bindParam(':link', $value, PDO::PARAM_STR);
+                $stmt2->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt2->bindParam(':social_id', $key, PDO::PARAM_INT);
+                $stmt2->execute();
+            } 
         }
 
         return true;

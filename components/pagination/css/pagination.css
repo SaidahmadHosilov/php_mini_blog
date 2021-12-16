@@ -27,17 +27,25 @@
 }
 
 #pagingg ul.pagination li a{
-	color:#fff;
+	color:#808080;
 	display:flex;
 	justify-content: center;
 	align-items: center;
 	text-decoration:none;
 	padding:7px 10px 7px 10px;
 	font-size: 1rem;
-	font-weight: normal;	
+	font-weight: normal;
+	/* background-color: #fff; */
+}
+
+#pagingg ul.pagination li a.current{
+	/* background-color: #fff; */
 }
 
 #pagingg ul.pagination li a img{
 	border:none;
 }
 	
+.last-1, .last-2{
+	display: none!important;
+}

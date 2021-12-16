@@ -25,6 +25,11 @@ $categories = Post::getCategoriesList();
     <link rel="stylesheet" href="/template/fonts/flaticon/font/flaticon.css">
     <link rel="stylesheet" href="/template/css/aos.css">
     <link rel="stylesheet" href="/template/css/tags.css">
+
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="/template/css/css/all.min.css">
+    <!-- Font awesome -->
+
     <!-- Pagination -->
     <link rel="stylesheet" href="/components/pagination/css/pagination.css">
     <link rel="stylesheet" href="/components/pagination/css/A_green.css">

@@ -2,6 +2,52 @@
 
 class Post
 {
+    public static function getPostsByLimit($limit)
+    {
+        $db = Db::getConnection();
+
+        $sql = "SELECT * FROM posts LIMIT :limit";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getPapularPosts()
+    {
+        $db = Db::getConnection();
+
+        $sql = "SELECT * FROM posts WHERE is_popular = 1 LIMIT 6";
+        $result = $db->prepare($sql);
+        $result->execute();
+
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function insertShortComment($comment, $post_id, $user_session, $user_id)
+    {
+        $db = Db::getConnection();
+        $date = date('Y-m-d H:i:s', time());
+
+        $sql = "INSERT INTO 
+                    comments(parent_id, text, time, user_id, post_id)
+                VALUES
+                    (:pr_id, :text, :time, :user_id, :post_id)";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':pr_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':text', $comment, PDO::PARAM_STR);
+        $stmt->bindParam(':time', $date, PDO::PARAM_STR);
+        $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $user_session, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $db->prepare("SELECT * FROM comments ORDER BY time DESC LIMIT 1");
+        $result->execute();
+
+        return $result->fetch(PDO::FETCH_ASSOC)['id'];
+    }
+
     public static function searchAjax($title)
     {
         $title = (string)($title);
@@ -182,26 +228,11 @@ class Post
                 VALUES ( '$comment', '$time', $userId, $postId )";
         $db->query($sql);
         
-        $result = $db->query("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
+        $result = $db->query("select comments.id, comments.parent_id, comments.text, comments.time, comments.post_id,comments.user_id, 
         users.name, users.image from comments inner join users 
-        on users.id = comments.user_id where comments.post_id = $postId order by time desc");
+        on users.id = comments.user_id where comments.post_id = $postId  order by time desc limit 1");
 
-        $i = 0;
-
-        $allComments = array();
-
-        while($row = $result->fetch()){
-            $allComments[$i]['id'] = $row['id'];
-            $allComments[$i]['text'] = $row['text'];
-            $allComments[$i]['time'] = $row['time'];
-            $allComments[$i]['post_id'] = $row['post_id'];
-            $allComments[$i]['user_id'] = $row['user_id'];
-            $allComments[$i]['name'] = $row['name'];
-            $allComments[$i]['image'] = $row['image'];
-            $i++;
-        }
-
-        return $allComments;
+        return $result->fetch(PDO::FETCH_ASSOC);
     }
 
     public static function getCurrentComments($postId)
@@ -209,11 +240,25 @@ class Post
         $db = Db::getConnection();
         $sql = ("select comments.id, comments.text, comments.time, comments.post_id,comments.user_id, 
         users.name, users.image from comments inner join users 
-        on users.id = comments.user_id where comments.post_id = $postId ORDER BY time DESC");
-        $result = $db->query($sql);
+        on users.id = comments.user_id where comments.post_id = :post_id 
+        AND parent_id IS NULL ORDER BY time ASC");
+
+        $sql2 = ("select comments.id, comments.parent_id, comments.text, comments.time, comments.post_id,comments.user_id, 
+        users.name, users.image from comments inner join users 
+        on users.id = comments.user_id where comments.post_id = :post_id 
+        AND parent_id IS NOT NULL ORDER BY time ASC");
+
+        $result = $db->prepare($sql);
+        $result->bindParam(':post_id', $postId, PDO::PARAM_INT);
+        $result->execute();
         $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetchAll();
+        $stmt = $db->prepare($sql2);
+        $stmt->bindParam(':post_id', $postId, PDO::PARAM_INT);
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+
+        return [$result->fetchAll(), $stmt->fetchAll()];
     }
 
     public static function countComments($id)

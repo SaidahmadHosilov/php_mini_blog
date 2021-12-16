@@ -16,21 +16,21 @@ class Blog
         return $result->fetch();
     }
 
-    public static function getBlogsByLimit($limit)
-    {
-        $db = Db::getConnection();
+    // public static function getBlogsByLimit($limit)
+    // {
+    //     $db = Db::getConnection();
 
-        $blogs = array();
+    //     $blogs = array();
 
-        $result = $db->query("SELECT blogs.id, blogs.title, blogs.image, blogs.text, blogs.time, 
-        blogs.ctg_id, categories.name FROM blogs 
-        INNER JOIN categories ON blogs.ctg_id = categories.id LIMIT $limit");
+    //     $result = $db->query("SELECT blogs.id, blogs.title, blogs.image, blogs.text, blogs.time, 
+    //     blogs.ctg_id, categories.name FROM blogs 
+    //     INNER JOIN categories ON blogs.ctg_id = categories.id LIMIT $limit");
 
-        $result->setFetchMode(PDO::FETCH_ASSOC);
+    //     $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetchAll();
+    //     return $result->fetchAll();
 
-    }
+    // }
 
     public static function getBlogs()
     {

@@ -354,3 +354,111 @@ function onChange(e){
 }
 
 // Debounce
+
+// Reply comment
+
+var replyBtns = document.querySelectorAll('.reply-btn');
+
+for(const btn of replyBtns){
+	btn.addEventListener('click', replyFunc);
+}
+
+function replyFunc()
+{
+	console.log('asdadasdasdkhas 126812365126351253');
+	var sessionId = this.getAttribute('data-user-session');
+	var userId = this.getAttribute('data-user-id');
+	var parentComment = this.parentElement;
+	var shortComment = document.querySelector('.short-comment')
+	
+	shortComment.setAttribute('data-id', userId);
+	shortComment.style.display = 'flex';
+	parentComment.appendChild(shortComment);
+}
+
+window.addEventListener('click', function(event){
+	if(!event.target.classList.contains('doNotTouch')){
+		document.querySelector('.short-comment').style.display = 'none'
+	}
+})
+
+$(document).ready(function(){
+	$('#short-comment-btn').click(function(e){
+		e.preventDefault();
+		var childBox = this.parentElement.parentElement
+			.parentElement.querySelector('.children')
+		
+		var postId = this.parentElement.getAttribute('data-post-id');
+		var userSession = this.parentElement.getAttribute('data-owner');
+		var parentId = this.parentElement.parentElement.getAttribute('data-comment-id');
+		var inputVal = this.parentElement.querySelector('input').value;
+		this.parentElement.querySelector('input').value = '';
+
+		if(inputVal != ''){
+       		
+			var form_data = new FormData();      
+			form_data.append('comment', inputVal);
+			form_data.append('post_id', postId);            
+			form_data.append('user_session', userSession);            
+			form_data.append('user_id', parentId);            
+
+			$.ajax({
+				type: "POST",
+                dataType: 'text',  // <-- what to expect back from the PHP script, if anything
+                cache: false,
+                contentType: false,
+                processData: false,
+                url: '/post/shortmsg',
+                data: form_data,
+                success: function(info)
+                {
+                    var result = JSON.parse(info);
+
+					if(result[0] == 'success'){
+						var user = result[1];
+						var cmBox = document.createElement('li')
+						cmBox.setAttribute('class', 'comment');
+						var vcard = document.createElement('div')
+						vcard.setAttribute('class', 'vcard');
+						var shortImg = document.createElement('img')
+						shortImg.setAttribute('src', '/upload/profile_image/'+user.image)
+						vcard.appendChild(shortImg);
+						cmBox.appendChild(vcard);
+						var cmBody = document.createElement('div');
+						cmBody.setAttribute('class', 'comment-body')
+						var shortH3 = document.createElement('h3')
+						shortH3.innerHTML = user.name;
+						var metaDiv = document.createElement('div')
+						metaDiv.setAttribute('class', 'meta')
+						metaDiv.innerHTML = result[2]
+						var shortCommentDel = document.createElement('a');
+						shortCommentDel.setAttribute('href', '/post/comment/delete/'+result[3]);
+						shortCommentDel.setAttribute('class', 'delete btn btn-sm btn-danger rounded');
+						shortCommentDel.textContent = 'Delete';
+						var shortCommentedit = document.createElement('a');
+						shortCommentedit.setAttribute('href', '/comment/edit/'+result[3]+'/'+postId);
+						shortCommentedit.setAttribute('class', 'btn mr-1 ml-1 btn-sm btn-secondary rounded');
+						shortCommentedit.textContent = 'Edit';
+						var cmP = document.createElement('p')
+						cmP.innerHTML = inputVal
+						cmBody.appendChild(shortH3);
+						cmBody.appendChild(metaDiv);
+						cmBody.appendChild(cmP);
+						cmBody.appendChild(shortCommentDel);
+						cmBody.appendChild(shortCommentedit);
+						cmBox.appendChild(cmBody);
+
+						document.querySelector('#comment_count').innerHTML = result[4].total
+						childBox.appendChild(cmBox);
+					}
+
+					if(result == 'error'){
+						console.log('error');
+					}
+                }
+			}); 
+		}
+	})
+})
+
+// Reply comment

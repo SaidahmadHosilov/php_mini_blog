@@ -3,6 +3,7 @@ commentBtn.addEventListener('click', leaveCommentToPost);
 function leaveCommentToPost(e)
 {
     e.preventDefault();
+    var mainBox = document.querySelector('.comment-list')
     var userId = commentBtn.getAttribute("data-id");
     var comment = document.getElementById('comment');
     var postId = document.getElementById('postId');
@@ -15,44 +16,57 @@ function leaveCommentToPost(e)
 
     xhr.onload = function(){
         if(this.status == 200){
-            var comments = JSON.parse(this.responseText); 
-            var output = '';
-            console.log(comments);
-            for(const i in comments[0]){
-                if( userId == comments[0][i].user_id ){
-                    output += '<li class="comment">'+
-                                    '<div class="vcard">'+
-                                        '<img src="/upload/profile_image/'+comments[0][i].image+'" alt="Image placeholder"'+
-                                        'class="width: 60px; height:60px;object-fit:cover;">'+
-                                    '</div>'+
-                                    '<div class="comment-body">'+
-                                        '<h3>'+comments[0][i].name+'</h3>'+
-                                        '<div class="meta">' + comments[0][i].time + '</div>'+
-                                        '<p>'+comments[0][i].text+'</p>'+
-                                        '<p>'+
-                                            '<a href="/post/comment/delete/'+comments[0][i].id+'" class="delete btn btn-sm btn-danger mr-2 rounded">Delete</a>'+
-                                            '<a href="/comment/edit/'+comments[0][i].id+'/'+comments[2]+'" class="btn btn-sm btn-secondary rounded">Edit</a>'+
-                                        '</p>'+
-                                    '</div>'+
-                                '</li>';
-                } else {
-                    output += '<li class="comment">'+
-                                    '<div class="vcard">'+
-                                        '<img src="/upload/profile_image/'+comments[0][i].image+'" alt="Image placeholder"'+
-                                        'class="width: 60px; height:60px;object-fit:cover;">'+
-                                    '</div>'+
-                                    '<div class="comment-body">'+
-                                        '<h3>'+comments[0][i].name+'</h3>'+
-                                        '<div class="meta">' + comments[0][i].time + '</div>'+
-                                        '<p>'+comments[0][i].text+'</p>'+
-                                    '</div>'+
-                                '</li>';
-                }
-                
-            }
+            var result = JSON.parse(this.responseText); 
 
-            document.getElementById('comment_count').innerHTML = (comments[1].total);
-            document.getElementById('comment-container').innerHTML = output;
+            if(result[0] == 'success'){
+                var user = result[1];
+                var cmBox = document.createElement('li')
+                cmBox.setAttribute('class', 'comment');
+                var vcard = document.createElement('div')
+                vcard.setAttribute('class', 'vcard');
+                var shortImg = document.createElement('img')
+                shortImg.setAttribute('src', '/upload/profile_image/'+user.image)
+                vcard.appendChild(shortImg);
+                cmBox.appendChild(vcard);
+                var cmBody = document.createElement('div');
+                cmBody.setAttribute('class', 'comment-body')
+                cmBody.setAttribute('data-comment-id', result[3].id)
+                var shortH3 = document.createElement('h3')
+                shortH3.innerHTML = user.name;
+                var metaDiv = document.createElement('div')
+                metaDiv.setAttribute('class', 'meta')
+                metaDiv.innerHTML = result[2]
+                var shortCommentDel = document.createElement('a');
+                shortCommentDel.setAttribute('href', '/post/comment/delete/'+result[3].id);
+                shortCommentDel.setAttribute('class', 'delete btn btn-sm btn-danger rounded');
+                shortCommentDel.textContent = 'Delete';
+                var shortCommentedit = document.createElement('a');
+                shortCommentedit.setAttribute('href', '/comment/edit/'+result[3].id+'/'+result[3].post_id);
+                shortCommentedit.setAttribute('class', 'btn mr-1 ml-1 btn-sm btn-secondary rounded');
+                shortCommentedit.textContent = 'Edit';
+                // var shortCommentReply = document.createElement('a');
+                // shortCommentReply.setAttribute('style', 'cursor: pointer;');
+                // shortCommentReply.setAttribute('data-user-id', result[3].user_id);
+                // shortCommentReply.setAttribute('data-user-session', result[3].user_id);
+                // shortCommentReply.setAttribute('class', 'reply pb-2 reply-btn pt-1 rounded doNotTouch');
+                // shortCommentReply.textContent = 'Reply';
+                var cmP = document.createElement('p')
+                cmP.innerHTML = result[3].text
+                cmBody.appendChild(shortH3);
+                cmBody.appendChild(metaDiv);
+                cmBody.appendChild(cmP);
+                cmBody.appendChild(shortCommentDel);
+                cmBody.appendChild(shortCommentedit);
+                // cmBody.appendChild(shortCommentReply);
+                cmBox.appendChild(cmBody);
+
+                mainBox.appendChild(cmBox);
+                document.querySelector('#comment_count').textContent = result[4].total
+            } 
+
+            if(result[0] == 'error'){
+                console.log('error');
+            }
         } else {
             console.log("Page Not Found")
         }

@@ -8,6 +8,7 @@ class UserController
             unset($_SESSION['user']);
         }        
 
+        $links = [];
         $bio = '';
         $name = '';
         $email = '';
@@ -19,9 +20,33 @@ class UserController
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            $image = $_FILES['image']['name'] == '' ? 'no-image.png' : $_FILES['image']['name'];
+
+            if(isset($_POST['telegram']) && strlen($_POST['telegram']) ){ 
+                $links[$_POST['telegram_id']] = $_POST['telegram'];
+            }
+            if(isset($_POST['instagram']) && strlen($_POST['instagram']) ){ 
+                $links[$_POST['instagram_id']] = $_POST['instagram'];
+            }
+            if(isset($_POST['facebook']) && strlen($_POST['facebook']) ){ 
+                $links[$_POST['facebook_id']] = $_POST['facebook'];
+            }
+            if(isset($_POST['twitter']) && strlen($_POST['twitter']) ){ 
+                $links[$_POST['twitter_id']] = $_POST['twitter'];
+            }
+            if(isset($_POST['linkedIn']) && strlen($_POST['linkedIn']) ){ 
+                $links[$_POST['linkedin_id']] = $_POST['linkedIn'];
+            }
 
             $errors = false;
+
+            foreach($links as $link){
+                if(preg_match_all('/ /', $link)){
+                    $errors['links'] = 'Linkni to\'g\'ri kiriting!';
+                }
+            }
+
+            $image = $_FILES['image']['name'] == '' ? 'no-image.png' : $_FILES['image']['name'];
+
 
             if(!User::checkName($name)){
                 $errors['name'] = 'Ism 4 ta yoki undan ko\'p belgiga ega bo\'lishi kerak';
@@ -90,8 +115,12 @@ class UserController
             //image upload finish
 
             if($errors == false){
-                
                 $_SESSION['user'] = User::register( $name, $email, $password, $image, $bio );
+                
+                if(!empty($links)){
+                    User::storeSocial($links, $_SESSION['user']);
+                }
+
                 $_SESSION['name'] = $name;
                 // $_SESSION['products'] = [];
                 header("Location: /");
@@ -167,12 +196,14 @@ class UserController
     public function actionProfileEdit($user_id)
     {
         $user = User::getUser($user_id);
+        $social_ids = User::isExistLinks($user_id);
 
         if($_SESSION['user'] != $user_id){
             echo "404 Not Found";
             exit;
         }
 
+        $links = [];
         $bio = '';
         $name = '';
         if(isset($_POST['submit'])){
@@ -183,6 +214,31 @@ class UserController
             $oldPhoto = $user['image'];
 
             $errors = false;
+
+            if(isset($_POST['telegram']) && strlen($_POST['telegram']) ){ 
+                $links[$_POST['telegram_id']] = $_POST['telegram'];
+            }
+            if(isset($_POST['instagram']) && strlen($_POST['instagram']) ){ 
+                $links[$_POST['instagram_id']] = $_POST['instagram'];
+            }
+            if(isset($_POST['facebook']) && strlen($_POST['facebook']) ){ 
+                $links[$_POST['facebook_id']] = $_POST['facebook'];
+            }
+            if(isset($_POST['twitter']) && strlen($_POST['twitter']) ){ 
+                $links[$_POST['twitter_id']] = $_POST['twitter'];
+            }
+            if(isset($_POST['linkedIn']) && strlen($_POST['linkedIn']) ){ 
+                $links[$_POST['linkedin_id']] = $_POST['linkedIn'];
+            }
+
+            $errors = false;
+
+            foreach($links as $link){
+                if(preg_match_all('/ /', $link)){
+                    $errors['links'] = 'Linkni to\'g\'ri kiriting!';
+                }
+            }
+
             if(!User::checkName($name)){
                 $errors['name'] = 'Ism 4 ta yoki undan ko\'p belgiga ega bo\'lishi kerak';
             }
@@ -243,7 +299,9 @@ class UserController
             } 
 
             if($errors == false){
-                
+                if(!empty($links)){
+                    User::addOrUpdateLinks( $user_id, $links);
+                }
                 User::updateUserData($user['id'], $name, $image, $bio);
                 header("Location: /user/profile/view/" . $user['id']);
             }

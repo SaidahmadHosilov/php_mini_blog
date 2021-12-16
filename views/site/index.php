@@ -7,17 +7,19 @@
         <div class="row align-items-stretch retro-layout-2">
 
           <?php 
-            foreach( $blogs as $blog ): 
-              $datetime = new DateTime($blog['time']);
+            foreach( $papularPosts as $post ): 
+              $datetime = new DateTime($post['created_at']);
           ?>
+
             <div class="col-md-4">
-              <a href="/blog/details/<?=$blog['id']?>" class="h-entry mb-30 v-height gradient" style="background-image: url(<?=$blog['image']?>);">
+              <a href="/post/details/<?=$post['id']?>" class="h-entry mb-30 v-height gradient" style="background-image: url(/upload/profile_image/<?=$post['image']?>);">
                 <div class="text">
-                  <h2><?=$blog['title']?></h2>
-                  <span class="date">July <?= $datetime->format('d') ?>, <?= $datetime->format('Y') ?></span>
+                  <h2><?=$post['title']?></h2>
+                  <span class="date"> <?= $datetime->format('m') ?> <?= $datetime->format('d') ?>, <?= $datetime->format('Y') ?></span>
                 </div>
               </a>
             </div>
+
           <?php endforeach; ?>
         </div>
       </div>
@@ -81,38 +83,38 @@
         <div class="row align-items-stretch retro-layout">
 
           <div class="col-md-5 order-md-2">
-            <a href="/blog/details/<?=$mainBlogs[0]['id']?>" class="hentry img-1 h-100 gradient" style="background-image: url('<?=$mainBlogs[0]['image']?>');">
-              <span class="post-category text-white bg-danger"><?=$mainBlogs[0]['name']?></span>
+            <a href="/post/details/<?=$posts[0]['id']?>" class="hentry img-1 h-100 gradient" style="background-image: url('upload/profile_image/<?=$posts[0]['image']?>');">
+              <span class="post-category text-white bg-danger"><?=$posts[0]['ctg_name']?></span>
               <div class="text">
-                <h2><?=$mainBlogs[0]['title']?></h2>
-                <span><?=$mainBlogs[0]['time']?></span>
+                <h2><?=$posts[0]['title']?></h2>
+                <span><?=$posts[0]['created_at']?></span>
               </div>
             </a>
           </div>
 
           <div class="col-md-7">
             
-            <a href="/blog/details/<?=$mainBlogs[1]['id']?>" class="hentry img-2 v-height mb30 gradient" style="background-image: url('<?=$mainBlogs[1]['image']?>');">
-              <span class="post-category text-white bg-success"><?=$mainBlogs[1]['name']?></span>
+            <a href="/post/details/<?=$posts[1]['id']?>" class="hentry img-2 v-height mb30 gradient" style="background-image: url('upload/profile_image/<?=$posts[1]['image']?>');">
+              <span class="post-category text-white bg-success"><?=$posts[1]['ctg_name']?></span>
               <div class="text text-sm">
-                <h2><?=$mainBlogs[1]['title']?></h2>
-                <span><?=$mainBlogs[1]['time']?></span>
+                <h2><?=$posts[1]['title']?></h2>
+                <span><?=$posts[1]['created_at']?></span>
               </div>
             </a>
             
             <div class="two-col d-block d-md-flex">
-              <a href="/blog/details/<?=$mainBlogs[2]['id']?>" class="hentry v-height img-2 gradient" style="background-image: url('<?=$mainBlogs[2]['image']?>');">
-                <span class="post-category text-white bg-primary"><?=$mainBlogs[2]['name']?></span>
+              <a href="/post/details/<?=$posts[2]['id']?>" class="hentry v-height img-2 gradient" style="background-image: url('upload/profile_image/<?=$posts[2]['image']?>');">
+                <span class="post-category text-white bg-primary"><?=$posts[2]['ctg_name']?></span>
                 <div class="text text-sm">
-                  <h2><?=$mainBlogs[2]['title']?></h2>
-                  <span><?=$mainBlogs[2]['time']?></span>
+                  <h2><?=$posts[2]['title']?></h2>
+                  <span><?=$posts[2]['created_at']?></span>
                 </div>
               </a>
-              <a href="/blog/details/<?=$mainBlogs[3]['id']?>" class="hentry v-height img-2 ml-auto gradient" style="background-image: url('<?=$mainBlogs[3]['image']?>');">
-                <span class="post-category text-white bg-warning"><?=$mainBlogs[3]['name']?></span>
+              <a href="/post/details/<?=$posts[3]['id']?>" class="hentry v-height img-2 ml-auto gradient" style="background-image: url('upload/profile_image/<?=$posts[3]['image']?>');">
+                <span class="post-category text-white bg-warning"><?=$posts[3]['ctg_name']?></span>
                 <div class="text text-sm">
-                  <h2><?=$mainBlogs[3]['title']?></h2>
-                  <span><?=$mainBlogs[3]['time']?></span>
+                  <h2><?=$posts[3]['title']?></h2>
+                  <span><?=$posts[3]['created_at']?></span>
                 </div>
               </a>
             </div>  

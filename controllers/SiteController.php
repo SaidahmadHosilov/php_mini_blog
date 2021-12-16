@@ -6,9 +6,9 @@ class SiteController
     {
         $db = Db::getConnection();
 
-        $blogs = Blog::getBlogs();
+        $papularPosts = Post::getPapularPosts();
         $recentPosts = Post::getRecentPosts(9);
-        $mainBlogs = Blog::getBlogsByLimit(4);
+        $posts = Post::getPostsByLimit(4);
 
         $limit = 3;
         $page = (int) (!isset($_GET["page"]) ? 1 : $_GET["page"]);

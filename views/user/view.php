@@ -19,12 +19,12 @@
                     <?=$user['email']?>                
             </span> <br>
             <h5 class="text-success">
-                Roll:
+                Role:
                     <?php
-                        if( $user['roll'] == null )
+                        if( $user['role'] == null )
                             echo "user";
                         else 
-                            echo $user['roll'];
+                            echo $user['role'];
                     ?>                
             </h5>
         </div>

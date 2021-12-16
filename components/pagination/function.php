@@ -12,6 +12,7 @@
 
 		// $row = mysql_fetch_array(mysql_query($query));
     	$total = $row['num'];
+		// $total = 200;
         $adjacents = "2"; 
 
     	$page = ($page == 0 ? 1 : $page);  
@@ -30,7 +31,7 @@
     		if ($lastpage < 7 + ($adjacents * 2))
     		{	
 				if( $page == 1 ) {
-					$pagination.= "<li><a class='current'><</a></li>";					
+					$pagination.= "<li><a class='current last-1'><</a></li>";					
 				} else {
 					$pagination.= "<li><a href='{$url}page=$prev'><</a></li>";					
 				}
@@ -95,7 +96,7 @@
     			$pagination.= "<li><a href='{$url}page=$next'>></a></li>";
                 // $pagination.= "<li><a href='{$url}page=$lastpage'>Last</a></li>";
     		}else{
-    			$pagination.= "<li><a class='current'>></a></li>";
+    			// $pagination.= "<li><a class='current last-2'>></a></li>";
                 // $pagination.= "<li><a class='current'>Last</a></li>";
             }
     		$pagination.= "</ul>\n";		

@@ -59,9 +59,16 @@
                     <p class="about-bio"><?=$person['bio']?></p>
 
                     <p class="mt-5">
-                    <a href="#" class="p-3"><span class="icon-facebook"></span></a>
-                    <a href="#" class="p-3"><span class="icon-instagram"></span></a>
-                    <a href="#" class="p-3"><span class="icon-twitter"></span></a>
+                    <?php
+                        if(isset($person['socials'])):
+                            foreach ($person['socials'] as $social):
+                    ?>
+                        <a target="_blank" href="<?=$social['link']?>" class="p-3"><span class="<?=$social['icon']?>"></span></a>
+                    <?php 
+                            endforeach;
+                        endif;
+                    ?>
+
                     </p>
                 </div>
             <?php endforeach; ?>

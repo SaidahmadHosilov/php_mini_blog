@@ -1302,3 +1302,61 @@ h1, h2, h3, h4, h5,
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.register-image i{
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.links-register-box{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.link-in{
+  padding: 2px;
+  width: 50%;
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.link-in-lg{
+  width: 100%;
+  padding: 2px;
+}
+
+.link-in i {
+  height: 43px;
+  width: 40px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 23px;
+  background-color: grey;
+}
+
+@media screen and (max-width: 470px){
+  .link-in{
+    width: 100%;
+  }
+}
+
+.short-comment{
+  transition: 0.2s ease-in-out;
+  max-width: 250px;
+  display: none;
+}
+
+.short-comment input{
+  width: 100%;
+  border: 1px solid rgb(209, 207, 207);
+  outline: none;
+  padding: 2px 5px;
+}
+
+.short-comment button{
+  cursor: pointer;
+  border: 1px solid rgb(209, 207, 207);
+  outline: none;
+}

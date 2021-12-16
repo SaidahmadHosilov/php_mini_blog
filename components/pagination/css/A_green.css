@@ -4,6 +4,7 @@
     
     ul.pagination li a
 	{
+		cursor: pointer;
 		border-radius:3px;	
 		-moz-border-radius:3px;
 		-webkit-border-radius:3px;
@@ -12,15 +13,14 @@
 
 	ul.pagination li a
 	{
-        color: #fff;
-		background: #2f89fc;
+		/* background: #fff; */
 		/* background:-moz-linear-gradient(top,#2f89fc,#0a74fd); */
-		background:-webkit-gradient(linear,0 0,0 100%,from(#2f89fc),to(#0a74fd));	
+		/* background:-webkit-gradient(linear,0 0,0 100%,from(#2f89fc),to(#0a74fd));	 */
 	}	
 	
 	ul.pagination li a:hover,
 	ul.pagination li a.current
 	{
-		color:#808080!important;
-		background:#fff;
+		background: #2f89fc;
+		color:#fff!important;
 	}
