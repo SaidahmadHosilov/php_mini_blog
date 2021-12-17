@@ -156,8 +156,10 @@ class PostController
 
     public function actionView($id)
     {
+        $post_tags = Post::getPostTags($id);
         $posts = Post::getPostsByLimit(4);
         $currentPost = Post::getCurrentPost($id);
+        $currentCategory = Category::getCtgById($currentPost['ctg_id']);
         $popularPosts = Post::getPopularPosts(3);
         $categories = Post::getCategoriesList();
         $tags = Post::getTagsList();
@@ -190,11 +192,14 @@ class PostController
 
     public function actionCreate()
     {
+        $tags = Post::getTagsList();
+        $categories = Post::getCategoriesList();
+
         $title = '';
         $text = '';
         $mainText = '';
         $ctgName = '';
-        $tagName = '';
+        $tagName = array();
         $image = '';
 
         if(isset($_POST['submit'])){
@@ -203,7 +208,7 @@ class PostController
             $text = $_POST['text'] ?? '';
             $mainText = $_POST['post-content'] ?? '';
             $ctgName = $_POST['ctg_name'] ?? '';
-            $tagName = $_POST['tag_name'] ?? '';
+            $tagName = $_POST['states'] ?? '';
             $image = $_FILES['image']['name'] == '' ? 'no-post.png' : $_FILES['image']['name'];
 
             $errors = false;

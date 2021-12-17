@@ -2,6 +2,28 @@
 
 class Post
 {
+    public static function getPostTags($post_id)
+    {
+        $db = Db::getConnection();
+        $tagNames = [];
+
+        $sql = "SELECT tag_id FROM post_tags WHERE post_id = :post_id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $tags = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $result = $db->prepare("SELECT * FROM tags WHERE id = :id");
+        foreach($tags as $tag_id):
+            $result->bindParam(':id', $tag_id, PDO::PARAM_INT);
+            $result->execute();
+            array_push($tagNames, $result->fetch(PDO::FETCH_ASSOC));
+        endforeach;
+
+        
+        return $tagNames;
+    }
+
     public static function getPostsByLimit($limit)
     {
         $db = Db::getConnection();
@@ -96,14 +118,43 @@ class Post
         return $result->fetch();
     }
 
-    public static function insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgName, $userId)
+    public static function insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgId, $userId)
     {
         $db = Db::getConnection();
         $mainContent = base64_encode($mainText);
+        $zero = 0;
 
-        $sql = "INSERT INTO posts (title, text, main_text, image, is_recent, created_at, tag_name, ctg_name, user_id)
-        VALUES ('$title', '$text', '$mainContent', '$image', 0, '$date', '$tagName', '$ctgName', $userId)"; 
-        $db->query($sql);
+        $stmt = $db->prepare("SELECT name FROM categories WHERE id = :ctgId");
+        $stmt->bindParam(':ctgId', $ctgId, PDO::PARAM_INT);
+        $stmt->execute();
+        $ctgName = $stmt->fetch(PDO::FETCH_ASSOC)['name'];
+
+        $sql = "INSERT INTO posts (title, text, main_text, image, is_recent, created_at, ctg_name, ctg_id, user_id)
+        VALUES (:title, :text, :mainText, :image, :is_recent, :date, :ctgName, :ctgId, :userId)"; 
+        $result = $db->prepare($sql);
+        $result->bindParam(':title', $title, PDO::PARAM_STR);
+        $result->bindParam(':text', $text, PDO::PARAM_STR);
+        $result->bindParam(':mainText', $mainContent, PDO::PARAM_STR);
+        $result->bindParam(':image', $image, PDO::PARAM_STR);
+        $result->bindParam(':is_recent', $zero, PDO::PARAM_INT);
+        $result->bindParam(':date', $date, PDO::PARAM_STR);
+        $result->bindParam(':ctgName', $ctgName, PDO::PARAM_STR);
+        $result->bindParam(':ctgId', $ctgId, PDO::PARAM_INT);
+        $result->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $result->execute();
+
+        $lastPost = $db->prepare("SELECT id FROM posts ORDER BY created_at DESC LIMIT 1");
+        $lastPost->execute();
+        $post_id = $lastPost->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $db->prepare("INSERT INTO post_tags(tag_id, post_id)
+                              VALUES(:tag_id, :post_id)");
+
+        foreach($tagName as $tag){
+            $stmt->bindParam(':tag_id', $tag, PDO::PARAM_INT);
+            $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $stmt->execute();
+        }
 
         return true;
     }
@@ -142,7 +193,7 @@ class Post
 
     public static function checkTagName($tagName)
     {
-        if( $tagName == '' || strlen($_POST['tag_name']) === 0 ) {
+        if( is_string($tagName) ) {
             return false;
         }
         return true;
@@ -175,6 +226,7 @@ class Post
     {
         $db = Db::getConnection();
 
+
         $sql = "SELECT * FROM posts WHERE id = $id";
 
         $result = $db->query($sql);
@@ -186,6 +238,7 @@ class Post
 
         $state = $db->query("SELECT * FROM users WHERE id = $userId");
         $state->setFetchMode(PDO::FETCH_ASSOC);
+
         array_push($arr, $state->fetch());
 
         return $arr;
@@ -206,9 +259,18 @@ class Post
         $db = Db::getConnection();
         $sql = "SELECT * FROM categories";
         $result = $db->query($sql);
-        $result->setFetchMode(PDO::FETCH_ASSOC);
-        
-        return $result->fetchAll();
+        $categories = $result->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $db->prepare("SELECT count(*) as count FROM posts WHERE ctg_id = :ctg_id");
+        $i = 0;
+        foreach($categories as $ctg){
+            $stmt->bindParam(':ctg_id', $ctg['id'], PDO::PARAM_INT);
+            $stmt->execute();
+            $categories[$i]['ctg_count'] = $stmt->fetch(PDO::FETCH_ASSOC);
+            $i++;
+        }
+
+        return $categories;
     }
 
     public static function getTagsList()

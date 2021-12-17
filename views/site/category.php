@@ -26,7 +26,7 @@
                     style="width:100%; height:255px; object-fit:cover;">
                 </a>
                 <div class="excerpt">
-                <span class="post-category text-white bg-secondary mb-3"><?=$post['ctg_name']?></span>
+                <span class="post-category text-white bg-secondary mb-3"><?=$ctgName['name']?></span>
 
                 <h2><a href="/post/details/<?=$post['id']?>"><?=$post['title']?></a></h2>
                 <div class="post-meta align-items-center mb-3 d-flex text-left clearfix">
@@ -37,7 +37,7 @@
                           style="width: 50px; height: 50px; object-fit:cover;">
                     </figure>
                   </a>
-                  <span class="d-inline-block mt-1">By <a href="#"><?=$post['user_name']?></a></span>
+                  <span class="d-inline-block mt-1">By <a href="/user/profile/view/<?=$post['user_id']?>"><?=$post['user_name']?></a></span>
                   <span>&nbsp;-&nbsp; <?=date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))?> <?= date( 'm', strtotime($post['created_at'])) ?>, <?= date( 'Y', strtotime($post['created_at'])) ?></span>
                 </div>
                 

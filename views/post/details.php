@@ -7,7 +7,7 @@
         <div class="row same-height justify-content-center">
         <div class="col-md-12 col-lg-10">
             <div class="post-entry text-center">
-            <span class="post-category text-white bg-success mb-3"><?=$currentPost['ctg_name']?></span>
+            <span class="post-category text-white bg-success mb-3"><?=$currentCategory['name']?></span>
             <h1 class="mb-4"><a href="#"><?=$currentPost['title']?></a></h1>
             <div class="post-meta align-items-center text-center">
                 <figure class="author-figure mb-0 mr-3 d-inline-block">
@@ -35,7 +35,13 @@
 
             
             <div class="pt-5">
-                <p>Categories:  <a href="#"><?=$currentPost['ctg_name']?></a> Tags: <a href="#"> <?=$currentPost['tag_name']?> </a></p>
+                <p>
+                    Categories:  <a href="/category/<?=$currentPost['ctg_id']?>"><?=$currentCategory['name']?></a> 
+                    Tags:
+                    <?php foreach($post_tags as $tg): ?> 
+                        <a href="#"> <?=$tg['name']?> | </a>
+                    <?php endforeach; ?>
+                </p>
             </div>
 
 
@@ -99,73 +105,6 @@
                         </ul>
                     </li>
                 <?php endforeach; ?>
-
-                <!-- <li class="comment">
-                    <div class="vcard">
-                        <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                    </div>
-                    <div class="comment-body">
-                        <h3>Jean Doe</h3>
-                        <div class="meta">January 9, 2018 at 2:21pm</div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                        <p><a href="#" class="reply rounded">Reply</a></p>
-                    </div> -->
-
-                <!-- <ul class="children">
-                    <li class="comment">
-                    <div class="vcard">
-                        <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                    </div>
-                    <div class="comment-body">
-                        <h3>Jean Doe</h3>
-                        <div class="meta">January 9, 2018 at 2:21pm</div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                        <p><a href="#" class="reply rounded">Reply</a></p>
-                    </div>
-
-
-                    <ul class="children">
-                        <li class="comment">
-                        <div class="vcard">
-                            <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                        </div>
-                        <div class="comment-body">
-                            <h3>Jean Doe</h3>
-                            <div class="meta">January 9, 2018 at 2:21pm</div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                            <p><a href="#" class="reply rounded">Reply</a></p>
-                        </div>
-
-                            <ul class="children">
-                            <li class="comment">
-                                <div class="vcard">
-                                <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                                </div>
-                                <div class="comment-body">
-                                <h3>Jean Doe</h3>
-                                <div class="meta">January 9, 2018 at 2:21pm</div>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                                <p><a href="#" class="reply rounded">Reply</a></p>
-                                </div>
-                            </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    </li>
-                </ul> -->
-                <!-- </li> -->
-
-                <!-- <li class="comment">
-                    <div class="vcard">
-                        <img src="/template/images/person_1.jpg" alt="Image placeholder">
-                    </div>
-                    <div class="comment-body">
-                        <h3>Jean Doe</h3>
-                        <div class="meta">January 9, 2018 at 2:21pm</div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
-                        <p><a href="#" class="reply rounded">Reply</a></p>
-                    </div>
-                </li> -->
                 </ul>
             <!-- END comment-list -->
             
@@ -259,9 +198,13 @@
             <h3 class="heading">Categories</h3>
             <ul class="categories">
                 <?php foreach($categories as $ctg): ?>
-                    <li><a href="/category/<?=$ctg['id']?>"><?=$ctg['name']?></a></li>
+                    <li>
+                        <a href="/category/<?=$ctg['id']?>">
+                            <?=$ctg['name']?> 
+                            <span>(<?=$ctg['ctg_count']['count']?>)</span>
+                        </a>
+                    </li>
                 <?php endforeach; ?>
-                <!-- <li><a href="#">Adventure <span>(14)</span></a></li> -->
             </ul>
             </div>
             <!-- END sidebar-box -->

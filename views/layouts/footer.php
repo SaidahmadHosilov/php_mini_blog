@@ -62,17 +62,25 @@
   <script src="/template/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
   <script src="/template/js/aos.js"></script>
   <script type="text/javascript" src="/template/js/autofill.js"></script>
-  <script type="text/javascript" src="/template/js/tags.js"></script>
+  <!-- <script type="text/javascript" src="/template/js/tags.js"></script> -->
   <!-- CK Editor -->
   <script src="/template/js/ckeditor/ckeditor.js"></script>
   <script>
     CKEDITOR.replace('post-content');
   </script>
   <!-- CK Editor -->
+  <!-- select2 -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- select2 -->
 
   <script src="/template/js/comment_ajax.js"></script>
   <script src="/template/js/main.js"></script>
 
+  <script>
+    $(document).ready(function() {
+        $('.multiple-select').select2();
+    });
+  </script>
 
   </body>
 </html>
