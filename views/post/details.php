@@ -94,8 +94,14 @@
                                             <h3><?=$childCm['name']?></h3>
                                             <div class="meta"><?=$childCm['time']?></div>
                                             <p><?=$childCm['text']?></p>
-                                            <a href="/post/comment/delete/<?=$childCm['id']?>" class="delete btn btn-sm btn-danger rounded">Delete</a>
-                                            <a href="/comment/edit/<?=$childCm['id']?>/<?=$currentPost['id']?>" class="btn mr-1 btn-sm btn-secondary rounded">Edit</a>
+                                            <?php 
+                                                if($user == $comment['user_id'] ): 
+                                            ?>
+                                                <a href="/post/comment/delete/<?=$childCm['id']?>" class="delete btn btn-sm btn-danger rounded">Delete</a>
+                                                <a href="/comment/edit/<?=$childCm['id']?>/<?=$currentPost['id']?>" class="btn mr-1 btn-sm btn-secondary rounded">Edit</a>
+                                            <?php
+                                                endif;
+                                            ?>
                                         </div>
                                     </li>
                             <?php 
