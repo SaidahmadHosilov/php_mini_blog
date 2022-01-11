@@ -26,18 +26,19 @@
                     style="width:100%; height:255px; object-fit:cover;">
                 </a>
                 <div class="excerpt">
-                <span class="post-category text-white bg-secondary mb-3"><?=$ctgName['name']?></span>
-
+                  <?php foreach($post['ctg_name'] as $ctg): ?>
+                    <span class="post-category text-white bg-secondary mb-3"><?=$ctg['ctg_name']?></span>
+                  <?php endforeach; ?>
                 <h2><a href="/post/details/<?=$post['id']?>"><?=$post['title']?></a></h2>
                 <div class="post-meta align-items-center mb-3 d-flex text-left clearfix">
                   <a href="/user/profile/view/<?=$post['user_id']?>">
                     <figure class="author-figure d-flex align-items-center mb-0 mr-3 float-left">
-                      <img src="/upload/profile_image/<?=$post['user_image']?>" 
+                      <img src="/upload/profile_image/<?=$post['users']['image']?>" 
                           alt="Image" class="img-fluid m-0"
                           style="width: 50px; height: 50px; object-fit:cover;">
                     </figure>
                   </a>
-                  <span class="d-inline-block mt-1">By <a href="/user/profile/view/<?=$post['user_id']?>"><?=$post['user_name']?></a></span>
+                  <span class="d-inline-block mt-1">By <a href="/user/profile/view/<?=$post['user_id']?>"><?=$post['users']['name']?></a></span>
                   <span>&nbsp;-&nbsp; <?=date('F', mktime(0, 0, 0, date( 'm', strtotime($post['created_at'])), 10))?> <?= date( 'm', strtotime($post['created_at'])) ?>, <?= date( 'Y', strtotime($post['created_at'])) ?></span>
                 </div>
                 

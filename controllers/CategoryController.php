@@ -4,20 +4,17 @@ class CategoryController
 {
     public function actionIndex($ctg_id)
     {
-        $limit = 1;
+        $limit = 3;
         $page = (int) (!isset($_GET["page"]) ? 1 : $_GET["page"]);
-        $statement = "SELECT categories.id as ctg_id, categories.name, posts.*, 
-        users.name as user_name, users.image as user_image  
-        FROM posts INNER JOIN categories ON posts.ctg_id = categories.id 
-        INNER JOIN users ON users.id = posts.user_id
-        WHERE categories.id = $ctg_id";
-        $ctgName = Category::getCtgById($ctg_id);
  
-        $statementCount = "posts INNER JOIN categories ON posts.ctg_id = categories.id 
-        INNER JOIN users ON users.id = posts.user_id WHERE categories.id = $ctg_id";
-        $ctgPosts = Pagination::setPagination($statement, $limit, $page);
+        $statementCount = "posts 
+                    INNER JOIN post_category 
+                    ON posts.id = post_category.post_id 
+                    AND post_category.ctg_id = $ctg_id";
         
-        $category = Category::getCtgById($ctg_id) ?? 'No category here';
+        $ctgPosts = Pagination::setPaginationForCtgPosts( $ctg_id, $limit, $page);
+
+        $category = Category::getOneCategory($ctg_id)[0] ?? 'No category here';
 
         require_once( ROOT . '/views/site/category.php' );
 

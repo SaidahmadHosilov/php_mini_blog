@@ -14,11 +14,12 @@ return array(
     // blog
 
     // post
-    'post/comment/delete/([0-9]+)' => 'post/deleteComment/$1',
+    'post/comment/delete' => 'post/deleteComment/$1',
     'post/comment/create' => 'post/createComment',
     'post/details/([0-9]+)' => 'post/view/$1',
     'post/edit/([0-9]+)' => 'post/editPost/$1',
     'post/delete/([0-9]+)' => 'post/deletePost/$1',
+    'post/shortmsgEdit' => 'post/shortMessagesEdit',
     'post/shortmsg' => 'post/shortMessages',
     'post/search' => 'post/search',
     'post/create' => 'post/create',

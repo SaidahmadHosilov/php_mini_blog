@@ -503,7 +503,12 @@ h1, h2, h3, h4, h5,
   max-width: 1200px; }
 
 .muted, .entry2 p {
-  color: #666666; }
+  color: #666666; 
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .site-cover {
   background-size: cover;
@@ -1344,7 +1349,12 @@ h1, h2, h3, h4, h5,
 
 .short-comment{
   transition: 0.2s ease-in-out;
-  max-width: 250px;
+  /* max-width: 250px; */
+  display: none;
+}
+
+.short-comment-edit{
+  transition: 0.2s ease-in-out;
   display: none;
 }
 

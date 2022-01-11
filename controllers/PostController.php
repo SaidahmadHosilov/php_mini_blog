@@ -8,7 +8,7 @@ class PostController
 
         $result = Post::searchAjax($title);
 
-        if(empty($result)){
+        if (empty($result)) {
             $result = ['There is no result'];
         }
 
@@ -23,7 +23,7 @@ class PostController
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $userId = $stmt->fetch();
 
-        if(Post::deletePost($post_id)){
+        if (Post::deletePost($post_id)) {
             header("Location: /user/profile/view/" . $userId['user_id']);
         } else {
             echo "404 not found";
@@ -34,46 +34,46 @@ class PostController
     public function actionEditPost($post_id)
     {
         $post = Post::getCurrentPost($post_id);
-        
-        if(isset($_POST['submit'])){
+
+        if (isset($_POST['submit'])) {
             $errors = false;
-            
+
             $title = $_POST['title'] ?? '';
             $text = $_POST['text'] ?? '';
             $main_text = base64_encode($_POST['post-content']) ?? '';
             $ctg_name = $_POST['ctg_name'] ?? '';
             $tag_name = $_POST['tag_name'] ?? '';
 
-            if(!Post::checkTitle($title)){
+            if (!Post::checkTitle($title)) {
                 $errors['title'] = 'Sarlavha 4 ta belgidan kam bo\'lmasin';
             }
-            if(!Post::checkText($text)){
+            if (!Post::checkText($text)) {
                 $errors['text'] = 'Bo\'sh bo\'lishi mumkin emas!';
             }
-            if(!Post::checkMainText($main_text)){
+            if (!Post::checkMainText($main_text)) {
                 $errors['mainText'] = 'Iltimos, postni to\'liqroq kiriting!';
             }
-            if(!Post::checkCtgName($ctg_name)){
+            if (!Post::checkCtgName($ctg_name)) {
                 $errors['ctg_name'] = 'Mosini tanlang!';
             }
-            if(!Post::checkTagName($tag_name)){
+            if (!Post::checkTagName($tag_name)) {
                 $errors['tag_name'] = 'Mosini tanlang!';
             }
 
             $image = $_FILES['image']['name'] == '' ? $post['image'] : $_FILES['image']['name'];
 
 
-            if($image != $post['image'] && $errors == false ){
+            if ($image != $post['image'] && $errors == false) {
                 // image upload
                 $target_dir = "upload/profile_image/";
                 $target_file = $target_dir . basename($image);
-                $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+                $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-                if( $_FILES['image']['name'] != '' ){
+                if ($_FILES['image']['name'] != '') {
                     // Check if image file is a actual image or fake image
-                    if(isset($_POST["submit"]) && empty($_FILES["image"])) {
+                    if (isset($_POST["submit"]) && empty($_FILES["image"])) {
                         $check = getimagesize($_FILES["image"]["tmp_name"]);
-                        if($check !== false) {
+                        if ($check !== false) {
                             $errors["image"] = "Bu rasm - " . $check["mime"] . ".";
                         } else {
                             $errors["image"] = "Bu rasm emas!";
@@ -91,8 +91,10 @@ class PostController
                     }
 
                     // Allow certain file formats
-                    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-                    && $imageFileType != "gif" ) {
+                    if (
+                        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                        && $imageFileType != "gif"
+                    ) {
                         $errors["image"] = "Kechirasiz, faqat JPG, JPEG, PNG & GIF tiplarni ishlatish mumkin.";
                     }
 
@@ -110,32 +112,33 @@ class PostController
                         }
                     }
                 }
-                
-                if(file_exists('upload/profile_image/' . basename($post['image']))){
+
+                if (file_exists('upload/profile_image/' . basename($post['image']))) {
                     unlink('upload/profile_image/' . basename($post['image']));
                 }
                 //image upload finish
             }
 
-            if($errors == false){
+            if ($errors == false) {
                 Post::updatePostData($post['id'], $title, $text, $main_text, $image, $ctg_name, $tag_name);
                 header("Location: /post/details/" . $post['id']);
             }
         }
 
-        require_once( ROOT . '/views/post/edit.php' );
+        require_once(ROOT . '/views/post/edit.php');
 
         return true;
     }
 
-    public function actionDeleteComment($comment_id)
+    public function actionDeleteComment()
     {
+        $comment_id = $_POST['comment_id'] ?? false;
         $postId = Post::getPostIdBeforeDeletingComment($comment_id);
-        if( Post::deleteComment($comment_id) ){
-            header('Location: /post/details/' . $postId['post_id']);
+        if (Post::deleteComment($comment_id, $postId)) {
+            echo json_encode(['success']);
             die;
         }
-        header("Location: /");
+        echo json_encode(['error']);
         die;
     }
     public function actionCreateComment()
@@ -159,7 +162,9 @@ class PostController
         $post_tags = Post::getPostTags($id);
         $posts = Post::getPostsByLimit(4);
         $currentPost = Post::getCurrentPost($id);
-        $currentCategory = Category::getCtgById($currentPost['ctg_id']);
+
+        $ctg_id = $currentPost[0]['ctg_id'];
+        $categoriesList = Category::getCategoriesList($id);
         $popularPosts = Post::getPopularPosts(3);
         $categories = Post::getCategoriesList();
         $tags = Post::getTagsList();
@@ -167,9 +172,24 @@ class PostController
         $childrenComments = Post::getCurrentComments($id)[1];
         $countComment = Post::countComments($id);
 
-        require_once( ROOT . '/views/post/details.php' );
+
+
+        require_once(ROOT . '/views/post/details.php');
 
         return true;
+    }
+
+    public static function actionShortMessagesEdit()
+    {
+        $comment = $_POST['comment'] ?? '';
+        $user_id = $_POST['user_id'] ?? '';
+
+        if (Post::ajaxUpdate($comment, $user_id)) {
+            echo json_encode([$comment]);
+            exit;
+        }
+        echo json_encode(['error']);
+        exit;
     }
 
     public static function actionShortMessages()
@@ -179,7 +199,7 @@ class PostController
         $user_session = $_POST['user_session'] ?? '';
         $user_id = $_POST['user_id'] ?? '';
 
-        if($cmId = Post::insertShortComment($comment, $post_id, $user_session, $user_id)){
+        if ($cmId = Post::insertShortComment($comment, $post_id, $user_session, $user_id)) {
             $user = User::getUser($user_session);
             $countComment = Post::countComments($post_id);
             echo json_encode(['success', $user, date("Y-m-d H:i:s", time()), $cmId, $countComment]);
@@ -202,53 +222,53 @@ class PostController
         $tagName = array();
         $image = '';
 
-        if(isset($_POST['submit'])){
+        if (isset($_POST['submit'])) {
 
             $title = $_POST['title'] ?? '';
             $text = $_POST['text'] ?? '';
-            $mainText = $_POST['post-content'] ?? '';
-            $ctgName = $_POST['ctg_name'] ?? '';
+            $mainText = base64_encode($_POST['post-content']) ?? '';
+            $ctgName = $_POST['categories'] ?? '';
             $tagName = $_POST['states'] ?? '';
             $image = $_FILES['image']['name'] == '' ? 'no-post.png' : $_FILES['image']['name'];
 
             $errors = false;
 
-            if(!Post::checkTitle($title)){
+            if (!Post::checkTitle($title)) {
                 $errors['title'] = 'Sarlavha 4 ta belgidan kam bo\'lmasin';
             }
-            if(!Post::checkText($text)){
+            if (!Post::checkText($text)) {
                 $errors['text'] = 'Bo\'sh bo\'lishi mumkin emas!';
             }
-            if(!Post::checkMainText($mainText)){
+            if (!Post::checkMainText($mainText)) {
                 $errors['mainText'] = 'Iltimos, postni to\'liqroq kiriting!';
             }
-            if(!Post::checkCtgName($ctgName)){
+            if (!Post::checkCtgName($ctgName)) {
                 $errors['ctg_name'] = 'Mosini tanlang!';
             }
-            if(!Post::checkTagName($tagName)){
+            if (!Post::checkTagName($tagName)) {
                 $errors['tag_name'] = 'Mosini tanlang!';
             }
 
             // image upload
             $target_dir = "upload/profile_image/";
             $target_file = $target_dir . basename($image);
-            $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-            if( $_FILES['image']['name'] != '' ){
+            if ($_FILES['image']['name'] != '') {
                 // Check if image file is a actual image or fake image
-                if(isset($_POST["submit"]) && empty($_FILES["image"])) {
+                if (isset($_POST["submit"]) && empty($_FILES["image"])) {
                     $check = getimagesize($_FILES["image"]["tmp_name"]);
-                    if($check !== false) {
+                    if ($check !== false) {
                         $errors["image"] = "Bu rasm - " . $check["mime"] . ".";
                     } else {
                         $errors["image"] = "Bu rasm emas!";
                     }
                 }
 
-                // Check if file already exists
-                if (file_exists($target_file)) {
-                    $errors["image"] = "Kechirasiz, bunday rasm mavjud!";
-                }
+                // // Check if file already exists
+                // if (file_exists($target_file)) {
+                //     $errors["image"] = "Kechirasiz, bunday rasm mavjud!";
+                // }
 
                 // Check file size
                 if ($_FILES["image"]["size"] > 5000000) {
@@ -256,27 +276,28 @@ class PostController
                 }
 
                 // Allow certain file formats
-                if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-                && $imageFileType != "gif" ) {
+                if (
+                    $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                    && $imageFileType != "gif"
+                ) {
                     $errors["image"] = "Kechirasiz, faqat JPG, JPEG, PNG & GIF tiplarni ishlatish mumkin.";
                 }
 
                 // Check if $uploadOk is set to 0 by an error
                 if (!empty($errors["image"])) {
-                    var_dump($errors["image"]);
-                    echo "Kechirasiz, rasm yuklanmadi, qaytadan urinib ko'ring!";
+                    // var_dump($errors["image"]);
+                    // echo "Kechirasiz, rasm yuklanmadi, qaytadan urinib ko'ring!";
                     // if everything is ok, try to upload file
-                } else {
-                    if(empty($errors['image'])){
-                        move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
-                    }
                 }
             }
             //image upload finish
 
-            if($errors == false){
+            if ($errors == false) {
                 $date = date('Y-m-d H:i:s', time());
-                if(Post::insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgName, $_SESSION['user'])){
+                if (empty($errors['image'])) {
+                    move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
+                }
+                if (Post::insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgName, $_SESSION['user'])) {
                     header("Location: /");
                 } else {
                     echo "Xatolik yuz berdi!";
@@ -285,7 +306,7 @@ class PostController
             }
         }
 
-        require_once( ROOT . '/views/post/create.php' );
+        require_once(ROOT . '/views/post/create.php');
 
         return true;
     }

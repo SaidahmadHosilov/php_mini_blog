@@ -27,12 +27,13 @@
                 </div>
                 <div class="col-md-4">
                     <label for="ctg_name" class="form-label">Category</label>
-                    <select id="ctg_name" name="ctg_name" class="form-control">
-                        <option value="test" selected>...</option>
-                        <?php foreach($categories as $ctg): ?>
-                            <option value="<?=$ctg['id']?>"><?=$ctg['name']?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div>
+                        <select class="form-control multiple-select" name="categories[]" multiple="multiple">
+                            <?php foreach($categories as $ctg): ?>
+                                <option value="<?=$ctg['id']?>"><?=$ctg['name']?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                     <span class="text-danger"><?=$errors['ctg_name'] ?? ''?></span>
                 </div>
                 <div class="col-md-4">

@@ -2,6 +2,20 @@
 
 class Post
 {
+    public static function ajaxUpdate($comment, $user_id)
+    {
+        $db = Db::getConnection();
+
+        $sql = "UPDATE comments SET text = :text WHERE id = :comment_id";
+
+        $statement = $db->prepare($sql);
+        $statement->bindParam(':text', $comment, PDO::PARAM_STR);
+        $statement->bindParam(':comment_id', $user_id, PDO::PARAM_INT);
+        $statement->execute();
+
+        return true;
+    }
+
     public static function getPostTags($post_id)
     {
         $db = Db::getConnection();
@@ -14,13 +28,13 @@ class Post
         $tags = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $result = $db->prepare("SELECT * FROM tags WHERE id = :id");
-        foreach($tags as $tag_id):
-            $result->bindParam(':id', $tag_id, PDO::PARAM_INT);
+
+        foreach ($tags as $tag_id) :
+            $result->bindParam(':id', $tag_id['tag_id'], PDO::PARAM_INT);
             $result->execute();
             array_push($tagNames, $result->fetch(PDO::FETCH_ASSOC));
         endforeach;
 
-        
         return $tagNames;
     }
 
@@ -33,7 +47,37 @@ class Post
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $posts = array();
+        $i = 0;
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $post_id = $row['id'];
+            $categories = $db->prepare("SELECT * FROM post_category WHERE post_id = :post_id");
+            $categories->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $categories->execute();
+            $categoriesList = $categories->fetchAll(PDO::FETCH_ASSOC);
+
+            $user_id = $row['user_id'];
+            $users = $db->prepare("SELECT * FROM users WHERE id = :user_id");
+            $users->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $users->execute();
+            $usersList = $users->fetchAll(PDO::FETCH_ASSOC);
+
+            $posts[$i]['id'] = $post_id;
+            $posts[$i]['title'] = $row['title'];
+            $posts[$i]['text'] = $row['text'];
+            $posts[$i]['main_text'] = $row['main_text'];
+            $posts[$i]['image'] = $row['image'];
+            $posts[$i]['is_recent'] = $row['is_recent'];
+            $posts[$i]['is_popular'] = $row['is_popular'];
+            $posts[$i]['created_at'] = $row['created_at'];
+            $posts[$i]['user_id'] = $user_id;
+            $posts[$i]['ctg_name'] = $categoriesList;
+            $posts[$i]['users'] = $usersList[0];
+            $i++;
+        }
+
+        return $posts;
     }
 
     public static function getPapularPosts()
@@ -78,7 +122,7 @@ class Post
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetchAll();        
+        return $result->fetchAll();
     }
 
     public static function deletePost($post_id)
@@ -88,17 +132,17 @@ class Post
         $photo->setFetchMode(PDO::FETCH_ASSOC);
         $photo = $photo->fetch();
 
-        if($photo['image'] != 'no-post.png' && $photo['image'] != 'no-image.png'){
+        if ($photo['image'] != 'no-post.png' && $photo['image'] != 'no-image.png') {
             unlink('upload/profile_image/' . $photo['image']);
         }
 
         $sql = "DELETE FROM posts WHERE id = $post_id";
         $result = $db->query($sql);
-        
+
         return true;
     }
 
-    public static function updatePostData( $post_id, $title, $text, $main_text, $image, $ctg_name, $tag_name)
+    public static function updatePostData($post_id, $title, $text, $main_text, $image, $ctg_name, $tag_name)
     {
         $db = Db::getConnection();
 
@@ -118,42 +162,52 @@ class Post
         return $result->fetch();
     }
 
-    public static function insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgId, $userId)
+    public static function insertDataPost($title, $text, $mainText, $image, $date, $tagName, $ctgName, $userId)
     {
         $db = Db::getConnection();
-        $mainContent = base64_encode($mainText);
+        $mainContent = ($mainText);
         $zero = 0;
 
-        $stmt = $db->prepare("SELECT name FROM categories WHERE id = :ctgId");
-        $stmt->bindParam(':ctgId', $ctgId, PDO::PARAM_INT);
-        $stmt->execute();
-        $ctgName = $stmt->fetch(PDO::FETCH_ASSOC)['name'];
-
-        $sql = "INSERT INTO posts (title, text, main_text, image, is_recent, created_at, ctg_name, ctg_id, user_id)
-        VALUES (:title, :text, :mainText, :image, :is_recent, :date, :ctgName, :ctgId, :userId)"; 
+        $sql = "INSERT INTO posts (title, text, main_text, image, is_recent, is_popular, created_at, user_id)
+        VALUES (:title, :text, :mainText, :image, :is_recent, :is_popular, :date, :userId)";
         $result = $db->prepare($sql);
         $result->bindParam(':title', $title, PDO::PARAM_STR);
         $result->bindParam(':text', $text, PDO::PARAM_STR);
         $result->bindParam(':mainText', $mainContent, PDO::PARAM_STR);
         $result->bindParam(':image', $image, PDO::PARAM_STR);
         $result->bindParam(':is_recent', $zero, PDO::PARAM_INT);
+        $result->bindParam(':is_popular', $zero, PDO::PARAM_INT);
         $result->bindParam(':date', $date, PDO::PARAM_STR);
-        $result->bindParam(':ctgName', $ctgName, PDO::PARAM_STR);
-        $result->bindParam(':ctgId', $ctgId, PDO::PARAM_INT);
         $result->bindParam(':userId', $userId, PDO::PARAM_INT);
         $result->execute();
 
         $lastPost = $db->prepare("SELECT id FROM posts ORDER BY created_at DESC LIMIT 1");
         $lastPost->execute();
-        $post_id = $lastPost->fetch(PDO::FETCH_ASSOC);
+        $post_id = $lastPost->fetch(PDO::FETCH_ASSOC)['id'];
 
         $stmt = $db->prepare("INSERT INTO post_tags(tag_id, post_id)
                               VALUES(:tag_id, :post_id)");
 
-        foreach($tagName as $tag){
+        foreach ($tagName as $tag) {
             $stmt->bindParam(':tag_id', $tag, PDO::PARAM_INT);
             $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
             $stmt->execute();
+        }
+
+        $stmt2 = $db->prepare("INSERT INTO post_category(ctg_id, ctg_name, post_id)
+                              VALUES(:ctg_id, :ctg_name, :post_id)");
+
+        foreach ($ctgName as $ctg) {
+
+            $getCtgName = $db->prepare("SELECT name FROM categories WHERE id = :id");
+            $getCtgName->bindParam(':id', $ctg, PDO::PARAM_INT);
+            $getCtgName->execute();
+            $category_name = $getCtgName->fetch(PDO::FETCH_ASSOC)['name'];
+
+            $stmt2->bindParam(':ctg_id', $ctg, PDO::PARAM_INT);
+            $stmt2->bindParam(':ctg_name', $category_name, PDO::PARAM_STR);
+            $stmt2->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $stmt2->execute();
         }
 
         return true;
@@ -161,7 +215,7 @@ class Post
 
     public static function checkTitle($title)
     {
-        if( strlen($title) < 4 ) {
+        if (strlen($title) < 4) {
             return false;
         }
         return true;
@@ -169,7 +223,7 @@ class Post
 
     public static function checkText($text)
     {
-        if( $text == '' ) {
+        if ($text == '') {
             return false;
         }
         return true;
@@ -177,7 +231,7 @@ class Post
 
     public static function checkMainText($text)
     {
-        if( $text == '' ) {
+        if ($text == '') {
             return false;
         }
         return true;
@@ -185,7 +239,7 @@ class Post
 
     public static function checkCtgName($ctgName)
     {
-        if( $ctgName == 'test' || $ctgName == '' ) {
+        if (is_string($ctgName)) {
             return false;
         }
         return true;
@@ -193,7 +247,7 @@ class Post
 
     public static function checkTagName($tagName)
     {
-        if( is_string($tagName) ) {
+        if (is_string($tagName)) {
             return false;
         }
         return true;
@@ -203,45 +257,62 @@ class Post
     {
         $db = Db::getConnection();
 
-        $sql = "SELECT * FROM posts WHERE is_recent = 1 ORDER BY created_at DESC LIMIT $limit";
+        $sql = "SELECT * FROM posts WHERE is_recent = 1 ORDER BY created_at DESC LIMIT :limit";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
-        $result = $db->query($sql);
-        $result->setFetchMode(PDO::FETCH_ASSOC);
+        $posts = array();
+        $i = 0;
 
-        $arr = $result->fetchAll();
-        $userId = '';
-        for($i = 0; $i < count($arr); $i++){
-            $userId = intval($arr[$i]['user_id']);
-            $state = $db->query("SELECT name, image FROM users WHERE id = $userId");
-            $state->setFetchMode(PDO::FETCH_ASSOC);
-            $arr1 = $state->fetch();
-            $arr[$i]['user_image'] = $arr1['image'];
-            $arr[$i]['user_name'] = $arr1['name'];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $post_id = $row['id'];
+            $categories = $db->prepare("SELECT * FROM post_category WHERE post_id = :post_id");
+            $categories->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $categories->execute();
+            $categoriesList = $categories->fetchAll(PDO::FETCH_ASSOC);
+
+            $user_id = $row['user_id'];
+            $users = $db->prepare("SELECT * FROM users WHERE id = :user_id");
+            $users->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $users->execute();
+            $usersList = $users->fetchAll(PDO::FETCH_ASSOC);
+
+            $posts[$i]['id'] = $post_id;
+            $posts[$i]['title'] = $row['title'];
+            $posts[$i]['text'] = $row['text'];
+            $posts[$i]['main_text'] = $row['main_text'];
+            $posts[$i]['image'] = $row['image'];
+            $posts[$i]['is_recent'] = $row['is_recent'];
+            $posts[$i]['is_popular'] = $row['is_popular'];
+            $posts[$i]['created_at'] = $row['created_at'];
+            $posts[$i]['user_id'] = $user_id;
+            $posts[$i]['ctg_name'] = $categoriesList;
+            $posts[$i]['users'] = $usersList;
+            $i++;
         }
 
-        return $arr;
+        return $posts;
     }
 
     public static function getCurrentPost($id)
     {
         $db = Db::getConnection();
 
+        $sql = "SELECT posts.*, users.name as username, users.email, users.image as user_image,
+                users.bio, users.role, post_category.ctg_id, post_category.ctg_name  
+                FROM posts 
+                INNER JOIN post_category
+                ON posts.id = post_category.post_id 
+                AND posts.id = :id
+                INNER JOIN users 
+                ON posts.user_id = users.id";
 
-        $sql = "SELECT * FROM posts WHERE id = $id";
+        $result = $db->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        $result->execute();
 
-        $result = $db->query($sql);
-        $result->setFetchMode(PDO::FETCH_ASSOC);
-
-        $arr = $result->fetch();
-        
-        $userId = intval($arr['user_id']);
-
-        $state = $db->query("SELECT * FROM users WHERE id = $userId");
-        $state->setFetchMode(PDO::FETCH_ASSOC);
-
-        array_push($arr, $state->fetch());
-
-        return $arr;
+        return $result->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function getPopularPosts($limit)
@@ -250,7 +321,7 @@ class Post
         $sql = "SELECT * FROM posts WHERE is_popular = 1 LIMIT $limit";
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
-        
+
         return $result->fetchAll();
     }
 
@@ -261,9 +332,9 @@ class Post
         $result = $db->query($sql);
         $categories = $result->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmt = $db->prepare("SELECT count(*) as count FROM posts WHERE ctg_id = :ctg_id");
+        $stmt = $db->prepare("SELECT count(*) as count FROM post_category WHERE ctg_id = :ctg_id");
         $i = 0;
-        foreach($categories as $ctg){
+        foreach ($categories as $ctg) {
             $stmt->bindParam(':ctg_id', $ctg['id'], PDO::PARAM_INT);
             $stmt->execute();
             $categories[$i]['ctg_count'] = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -280,7 +351,7 @@ class Post
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetchAll() ;
+        return $result->fetchAll();
     }
 
     public static function insertDataComment($userId, $time, $comment, $postId)
@@ -289,7 +360,7 @@ class Post
         $sql = "INSERT INTO comments ( text, time, user_id, post_id ) 
                 VALUES ( '$comment', '$time', $userId, $postId )";
         $db->query($sql);
-        
+
         $result = $db->query("select comments.id, comments.parent_id, comments.text, comments.time, comments.post_id,comments.user_id, 
         users.name, users.image from comments inner join users 
         on users.id = comments.user_id where comments.post_id = $postId  order by time desc limit 1");
@@ -330,15 +401,26 @@ class Post
         $result = $db->query($sql);
         $result->setFetchMode(PDO::FETCH_ASSOC);
 
-        return $result->fetch();   
+        return $result->fetch();
     }
 
-    public static function deleteComment($id)
+    public static function deleteComment($id, $post_id)
     {
         $db = Db::getConnection();
-        $sql = "DELETE FROM comments WHERE id = $id";
-        $db->query($sql);
 
+        $query = $db->prepare("SELECT parent_id FROM comments WHERE id = :id");
+        $query->bindParam(":id", $id, PDO::PARAM_INT);
+        $query->execute();
+        $parent_id = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($parent_id != null) {
+            $sql = "DELETE FROM comments WHERE id = $id";
+            $db->query($sql);
+            return true;
+        }
+
+        $stmt = "DELETE FROM comments WHERE id = $id OR parent_id = $id AND post_id = $post_id";
+        $db->query($stmt);
         return true;
     }
 }
